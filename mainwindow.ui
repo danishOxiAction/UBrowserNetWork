@@ -37,13 +37,13 @@
      <string>Go!</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit">
+   <widget class="QPlainTextEdit" name="plainTextEdit">
     <property name="geometry">
      <rect>
-      <x>33</x>
-      <y>57</y>
-      <width>611</width>
-      <height>331</height>
+      <x>40</x>
+      <y>50</y>
+      <width>601</width>
+      <height>341</height>
      </rect>
     </property>
    </widget>
@@ -54,7 +54,7 @@
      <x>0</x>
      <y>0</y>
      <width>664</width>
-     <height>22</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>

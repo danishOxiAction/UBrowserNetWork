@@ -2,12 +2,18 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
+#include <QNetworkAccessManager>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 #include <QUrl>
-
+#include <QString>
+#include <QList>
+#include <QNetworkCookie>
+#include <QNetworkCookieJar>
 #include <QTextCodec>
+
+#include "Kernel/http_request.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,13 +28,12 @@ public:
     ~MainWindow();
 
 private slots:
+
+
     void on_pushButton_clicked();
-    // cлот выполняемый при завершении запроса:
-    void replyFinished();
 
 private:
     Ui::MainWindow *ui;
-    QNetworkAccessManager* manager;
 };
 
 #endif // MAINWINDOW_H
