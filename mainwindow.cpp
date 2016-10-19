@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->lineEdit->setText("http://easy-qt.blogspot.ru/");
+    ui->lineEdit->setText("http://shotinleg.ru/test/index.php");  //  http://easy-qt.blogspot.ru/
 
 
 }
@@ -20,5 +20,8 @@ void MainWindow::on_pushButton_clicked()
 {
     QString html = HttpRequest::get(ui->lineEdit->text() );
 
+
     ui->plainTextEdit->setPlainText( html );
+
 }
+
