@@ -3,59 +3,86 @@
 #include <QTextStream>
 
 QList<QString> HttpRequest::last_host;
-QMap <QString,QString> HttpRequest::last_hosts_with_cookies;
+QMap <QString,QByteArray> HttpRequest::last_hosts_with_cookies;
 
-// написать функцию которая проверяет наличее куки по хосту в мапе
-//если он есть, возвращает как QByteArray
-// если нет, то подгружает из файла, добавляет его в Мар и возращает как QBA
+// ++написать функцию которая проверяет наличее куки по хосту в листе
+//++если он есть, возвращает как QByteArray
+// +-если нет, то подгружает из файла, добавляет его в Мар и возращает как QBA
 
-//убрать ввод ввывод файла из метода запроса
+//+-убрать ввод ввывод файла из метода запроса
 
 //босле обновления надо будет удалить файл с кукой ( работать будет по другому)
 HttpRequest::HttpRequest()
 {
-    //    QFile cookiesfile("Cookies");
-    //    if(cookiesfile.open(QFile::ReadOnly | QFile::Text))
-    //    {
-    //        if(!cookiesfile.atEnd())
-    //        {
-    //            QString host = cookiesfile.readLine();
-    //            host = host.left(host.indexOf('|'));
-    //            last_hosts_with_cookies[host]= "empty"; // тут же push host в last_host
-    //        }
-    //    }
-    //    else
-    //    {
-    //        //throw;
-    //    }
-    //    cookiesfile.close();
+        QFile cookiesfile("Cookies");
+        if(cookiesfile.open(QFile::ReadOnly | QFile::Text))
+        {
+            if(!cookiesfile.atEnd())
+            {
+                QByteArray host = cookiesfile.readLine();
+                host = host.left(host.indexOf('|'));
+                last_hosts_with_cookies[host]= "empty";
+                last_host.push_front(host);
+            }
+        }
+        else
+        {
+            //throw;
+        }
+        cookiesfile.close();
 }
 
-void HttpRequest::set_new_host_and_cookies(QString& host, QList<QNetworkCookie>&  cookies)
+bool HttpRequest::check_host_to_visit(QString host)
 {
-    //    QString cookie;
-    //    for(int i(0);i<cookies.size();i++)
-    //    {
-    //        cookie+=cookies.at(i).name()+'='+cookies.at(i).value()+';';
-    //    }
+    for(int i(0);i<last_host.size();i++)
+    {
+        if(host==last_host.at(i))
+        {
+            return true;
+        }
+    }
 
-    //    last_hosts_with_cookies[host]=cookie;  // тут же push host в last_host
+    return false;
 
-    //    QFile cookiesfile("Cookies");
-    //    if(cookiesfile.open(QFile::Append | QFile::Text))
-    //    {
-    //        QString host_and_cookie=host +'|'+cookie;
-    //        QTextStream out(&cookiesfile);
-    //        out << host_and_cookie << "\n";
-    //    }
-    //    else
-    //    {
-    //        //throw;
-    //    }
-    //    cookiesfile.close();
+}
+
+QByteArray HttpRequest::get_cookie_by_host(QString host)
+{
+    if(last_hosts_with_cookies[host]=="empty")
+    {
+        // функций get_cookie_от_file и return QByteArray + добавить куку в мар
+    }
+    else
+    {
+       return last_hosts_with_cookies[host];
+    }
+}
+
+void HttpRequest::set_new_host_and_cookies(QString host, QList<QNetworkCookie>&  cookies)
+{
+        QByteArray cookie;
+        for(int i(0);i<cookies.size();i++)
+        {
+            cookie+=cookies.at(i).name()+'='+cookies.at(i).value()+';';
+        }
+
+        last_hosts_with_cookies[host]=cookie;
+
+        last_host.push_front(host); // ошибка двойного попадания хоста в лист (даже если есть условие отсудствие хотста в списке)
 
 
-
+        QFile cookiesfile("Cookies");
+        if(cookiesfile.open(QFile::Append | QFile::Text))
+        {
+            QString host_and_cookie=host +'|'+cookie;
+            QTextStream out(&cookiesfile);
+            out << host_and_cookie << "\n";
+        }
+        else
+        {
+            //throw;
+        }
+        cookiesfile.close();
 
 }
 
@@ -88,21 +115,16 @@ QString HttpRequest::get(const QString &url)
     QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), manager, SLOT(deleteLater()));
     wait.exec();
 
-    if(!check_host_to_visit(get_host_by_url(url)))
+    if(!check_host_to_visit(QUrl(url).host()))
     {
 
         QNetworkCookieJar * cookie = manager->cookieJar();
         QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
 
-        cookiesfile.open(QFile::WriteOnly | QFile::Text);
-        QTextStream out(&cookiesfile);
-        for( int i=0; i < cookies.size(); i++)
-            out  << cookies.at(i).name() << "=" << cookies.at(i).value() << ";";
-        out << "\n";
+
+        set_new_host_and_cookies(QUrl(url).host(),cookies);
 
 
-        cookiesfile.close();
-        last_host.push_front(get_host_by_url(url));
     }
 
     QByteArray answer = reply->readAll();
@@ -120,16 +142,3 @@ QString HttpRequest::get(const QString &url)
 //    return url;
 //}
 
-bool HttpRequest::check_host_to_visit(QString host)
-{
-    for(int i(0);i<last_host.size();i++)
-    {
-        if(host==last_host.at(i))
-        {
-            return true;
-        }
-    }
-
-    return false;
-
-}

@@ -18,7 +18,7 @@ class HttpRequest
 {
 public:
 
-    static QString get( const QString& url );
+    QString get( const QString& url );
     HttpRequest();
 
 
@@ -26,11 +26,12 @@ public:
 protected:
 
 
-    static QMap<QString,QString> last_hosts_with_cookies;
-    static QList<QString> last_host;
-    static void set_new_host_and_cookies(QString&,QList<QNetworkCookie>&);
+    static QMap<QString,QByteArray> last_hosts_with_cookies;
+   static QList<QString> last_host;
+    static void set_new_host_and_cookies(QString,QList<QNetworkCookie>&);
     //static QString get_host_by_url(QString url); //получение host по url
     static bool check_host_to_visit(QString host);
+    QByteArray get_cookie_by_host(QString);
 };
 
 #endif // HTTPREQUEST_H

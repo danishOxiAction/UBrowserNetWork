@@ -18,8 +18,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    QString html = HttpRequest::get(ui->lineEdit->text() );
-
+   // QString html = HttpRequest::get(ui->lineEdit->text() );
+    HttpRequest request;
+     QString html =  request.get(ui->lineEdit->text() );
 
     ui->plainTextEdit->setPlainText( html );
 
