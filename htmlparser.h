@@ -16,6 +16,8 @@ public:
     void                    parse(QString::iterator, QString::iterator);
     QString::iterator       skip_tag(QString::iterator, QString::iterator);
     void                    parse_tag(QString::iterator, QString::iterator);
+    QString::iterator       skip_text(QString::iterator, QString::iterator);
+    void                    parse_text(QString::iterator, QString::iterator);
     void                    print()
     {
         tree->print();
