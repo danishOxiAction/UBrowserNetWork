@@ -32,6 +32,7 @@ protected:
     //static QString get_host_by_url(QString url); //получение host по url
     static bool check_host_to_visit(QString host);
     QByteArray get_cookie_by_host(QString);
+    QByteArray get_cookie_from_file(QString);
 };
 
 #endif // HTTPREQUEST_H
