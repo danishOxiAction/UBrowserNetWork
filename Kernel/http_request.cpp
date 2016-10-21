@@ -2,7 +2,7 @@
 #include <QDateTime>
 #include <QTextStream>
 
-QList<QString> HttpRequest::last_host;
+//QList<QString> HttpRequest::last_host;
 QMap <QString,QByteArray> HttpRequest::last_hosts_with_cookies;
 
 // ++написать функцию которая проверяет наличее куки по хосту в листе
@@ -10,7 +10,7 @@ QMap <QString,QByteArray> HttpRequest::last_hosts_with_cookies;
 // ++если нет, то подгружает из файла, добавляет его в Мар и возращает как QBA
 //++убрать ввод ввывод файла из метода запроса
 
-//убрать лист, оставить только мап
+//++убрать лист, оставить только мап
 
 
 HttpRequest::HttpRequest()
@@ -23,7 +23,6 @@ HttpRequest::HttpRequest()
             QByteArray host = cookiesfile.readLine();
             host = host.left(host.indexOf('|'));
             last_hosts_with_cookies[host]= "empty";
-            last_host.push_front(host);
         }
     }
     else
@@ -35,16 +34,14 @@ HttpRequest::HttpRequest()
 
 bool HttpRequest::check_host_to_visit(QString host)
 {
-    for(int i(0);i<last_host.size();i++)
+    for( QMap<QString,QByteArray>::iterator it =last_hosts_with_cookies.begin();it!=last_hosts_with_cookies.end();++it)
     {
-        if(host==last_host.at(i))
+        if(it.key()==host)
         {
             return true;
         }
     }
-    
     return false;
-    
 }
 
 QByteArray HttpRequest::get_cookie_from_file(QString host)
@@ -101,9 +98,6 @@ void HttpRequest::set_new_host_and_cookies(QString host, QList<QNetworkCookie>& 
     }
     
     last_hosts_with_cookies[host]=cookie;
-    
-    last_host.push_front(host); // ошибка двойного попадания хоста в лист (даже если есть условие отсудствие хотста в списке)
-    
     
     QFile cookiesfile("Cookies");
     if(cookiesfile.open(QFile::Append | QFile::Text))

@@ -27,7 +27,6 @@ protected:
 
 
     static QMap<QString,QByteArray> last_hosts_with_cookies;
-   static QList<QString> last_host;
     static void set_new_host_and_cookies(QString,QList<QNetworkCookie>&);
     //static QString get_host_by_url(QString url); //получение host по url
     static bool check_host_to_visit(QString host);
