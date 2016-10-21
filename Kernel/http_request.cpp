@@ -11,7 +11,8 @@ QMap <QString,QByteArray> HttpRequest::last_hosts_with_cookies;
 //++убрать ввод ввывод файла из метода запроса
 
 //++убрать лист, оставить только мап
-
+//++ структурировать get, вынести часть запроса в функцию: принимает QNetworkRequest request
+//++ и QNetworkAccessManager* manager, возвращает QNetworkReply* reply
 
 HttpRequest::HttpRequest()
 {
@@ -44,6 +45,7 @@ bool HttpRequest::check_host_to_visit(QString host)
     return false;
 }
 
+
 QByteArray HttpRequest::get_cookie_from_file(QString host)
 {
     QFile cookiesfile("Cookies");
@@ -72,6 +74,7 @@ QByteArray HttpRequest::get_cookie_from_file(QString host)
     }
     cookiesfile.close();
 }
+
 
 QByteArray HttpRequest::get_cookie_by_host(QString host)
 {
@@ -114,6 +117,17 @@ void HttpRequest::set_new_host_and_cookies(QString host, QList<QNetworkCookie>& 
     
 }
 
+QNetworkReply *HttpRequest::get_reply_by_request(QNetworkRequest& request, QNetworkAccessManager*manager)
+{
+    QNetworkReply* reply = manager->get( request );
+    QEventLoop wait;
+    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), &wait, SLOT(quit()));
+    QTimer::singleShot(300000, &wait, SLOT(quit()));
+
+    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), manager, SLOT(deleteLater()));
+    wait.exec();
+    return reply;
+}
 
 
 QString HttpRequest::get(const QString &url)
@@ -121,39 +135,34 @@ QString HttpRequest::get(const QString &url)
     
     
     QNetworkRequest request;
-    
-    request.setUrl( QUrl(url) );
-    if(check_host_to_visit(QUrl(url).host()))//  функция определения хоста
-    {
-        QByteArray cook=get_cookie_by_host(QUrl(url).host());
-        request.setRawHeader("Cookie", cook);
-    }
-    
     QNetworkAccessManager* manager = new QNetworkAccessManager();
-    QNetworkReply* reply = manager->get( request );
-    QEventLoop wait;
-    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), &wait, SLOT(quit()));
-    QTimer::singleShot(300000, &wait, SLOT(quit()));
-    
-    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), manager, SLOT(deleteLater()));
-    wait.exec();
-    
-    if(!check_host_to_visit(QUrl(url).host()))
+    QNetworkReply* reply;
+
+    request.setUrl( QUrl(url) );
+    if(check_host_to_visit(QUrl(url).host()))// проверяем посещали ли мы этот хост
     {
-        
+        QByteArray cook=get_cookie_by_host(QUrl(url).host()); // если да, выгружагем куку
+        request.setRawHeader("Cookie", cook);
+        reply = get_reply_by_request(request,manager); // соверщаем запрос с передачей куки
+    }
+    else                                    // если нет
+    {
+        reply = get_reply_by_request(request,manager); // совершаем запрос
+
         QNetworkCookieJar * cookie = manager->cookieJar();
         QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
-        
-        
-        set_new_host_and_cookies(QUrl(url).host(),cookies);
-        
-        
+
+
+        set_new_host_and_cookies(QUrl(url).host(),cookies); // выгружаем куку и сохраняем ее
+
+
     }
     
     QByteArray answer = reply->readAll();
     reply->deleteLater();
     
     return answer;
+
 }
 
 
