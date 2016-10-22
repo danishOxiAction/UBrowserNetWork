@@ -1,4 +1,4 @@
-#include "htmlparser.h"
+#include "tokenizer.h"
 
 #include <QApplication>
 #include <QTextStream>
@@ -15,9 +15,9 @@ int main(/*int argc, char *argv[]*/)
     {
         QString str = index.readAll();
 
-        HtmlParser parser;
-        parser.parse(str.begin(),str.end());
-        parser.print();
+        Tokenizer tokenizer("index.html");
+        tokenizer.start_tokenization();
+        tokenizer.print_tokens();
     }
     else
     {
