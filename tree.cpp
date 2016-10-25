@@ -40,59 +40,59 @@ QPair<QString, QString> Tree::cut_on_name_and_attributes(const QString& tag)
 
 void Tree::push(Token_type type, const QString& tag)
 {
-    if(type == START_TAG)
-        push_open_tag(tag);
+    if(type == TEXT)
+        push_text_tag(tag);
     else
-        push_text_or_close_tag(type, tag);
+        push_open_or_close_tag(type, tag);
 }
 
-void Tree::push_open_tag(const QString & tag)
+void Tree::push_open_or_close_tag(Token_type type, const QString & tag)
 {
     QPair<QString,QString> _tag = cut_on_name_and_attributes(tag);
 
-    if(root == nullptr)
+    if(type == START_TAG)
     {
-        root = new Node;
+        if(root == nullptr)
+        {
+            root = new Node;
 
-        root->parent = nullptr;
-        root->tag_name = _tag.first;
-        root->attributes = _tag.second;
+            root->parent = nullptr;
+            root->tag_name = _tag.first;
+            root->attributes = _tag.second;
 
-        now = root;
+            now = root;
+        }
+        else
+        {
+            now->child.push_front(new Node);
+
+            Node* temp = now->child.front();
+
+            temp->parent = now;
+            temp->tag_name = _tag.first;
+            temp->attributes = _tag.second;
+
+            now = temp;
+
+            temp = nullptr;
+        }
     }
-    else
+    else // END_TAG
     {
-        now->child.push_front(new Node);
-
-        Node* temp = now->child.front();
-
-        temp->parent = now;
-        temp->tag_name = _tag.first;
-        temp->attributes = _tag.second;
-
-        now = temp;
-
-        temp = nullptr;
+        now = search_node(now, _tag.first);
     }
 }
 
-void Tree::push_text_or_close_tag(Token_type type, const QString& tag)
+void Tree::push_text_tag(const QString& tag)
 {
-    if(type == TEXT)
-    {
-        now->child.push_front(new Node);
+    now->child.push_front(new Node);
 
-        Node* temp = now->child.front();
+    Node* temp = now->child.front();
 
-        temp->parent = now;
-        temp->tag_name = tag;
+    temp->parent = now;
+    temp->tag_name = tag;
 
-        now = temp;
+    now = temp;
 
-        temp = nullptr;
-    }
-    else // type == END_TAG
-    {
-        now = search_node(now,tag);
-    }
+    temp = nullptr;
 }

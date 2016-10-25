@@ -3,7 +3,7 @@
 
 #include "parser.h"
 
-#include <QVector>
+#include <QList>
 #include <QString>
 #include <QMap>
 #include <QPair>
@@ -17,7 +17,7 @@ public:
     struct Node
     {
         Node* parent;
-        QVector<Node*> child;
+        QList<Node*> child;
 
         QString tag_name;
         QString /*Attribute*/ attributes;
@@ -27,8 +27,8 @@ public:
     Node* root;
 
     Node*                   search_node(Node*, const QString&);
-    void                    push_open_tag(const QString&);
-    void                    push_text_or_close_tag(Token_type, const QString&);
+    void                    push_open_or_close_tag(Token_type, const QString&);
+    void                    push_text_tag(const QString&);
 public:
 
     Tree();

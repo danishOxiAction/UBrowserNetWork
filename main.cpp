@@ -18,7 +18,7 @@ void print_tree(int level, Tree::Node* node)
     {
         str << "_";
     }
-    str << node->tag_name << "\n";
+    str << node->tag_name <<"(" << node->attributes << ")" << "\n";
 
     level++;
     for(int i = 0; i < node->child.size(); i++)

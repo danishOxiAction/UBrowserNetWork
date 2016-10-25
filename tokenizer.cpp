@@ -86,9 +86,20 @@ void Tokenizer::open_tag_token(QString::iterator begin, QString::iterator end)
     {
         if(*it == '/')
         {
-            type = END_TAG;
-            it++;
+            if(it == begin)
+            {
+                type = END_TAG;
+                it++;
+            }
+            else if(it+1 == end)
+            {
+                // Если встречается тег типа <* />, то для него создаётся закрывающийся
+                tokens.push_back(Token(START_TAG,tag));
+                tokens.push_back(Token(END_TAG,tag));
+                return;
+            }
         }
+
 
         tag += *it;
 
