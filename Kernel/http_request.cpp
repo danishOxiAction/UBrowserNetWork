@@ -14,6 +14,8 @@ QMap <QString,QByteArray> HttpRequest::last_hosts_with_cookies;
 //++ структурировать get, вынести часть запроса в функцию: принимает QNetworkRequest request
 //++ и QNetworkAccessManager* manager, возвращает QNetworkReply* reply
 
+// добавить datd для get
+// сохранение новых куки с вымищением старых
 HttpRequest::HttpRequest()
 {
     QFile cookiesfile("Cookies");
@@ -175,9 +177,10 @@ QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
 
     post_data.append("\r\n");
 
-    for(QMap <QString, QString>::iterator it = data.begin();it !=data.end(); ++it)
+    for(QMap <QString, QString>::iterator it = data.begin();it !=data.end(); ++it) //QMap <QString, QString>::iterator it ~ auto it
     {
 
+        //post_data.append(it.key()+"="+it.value())
         post_data.append("--" + boundary + "\r\n");
         post_data.append("Content-Disposition: form-data; name=\""+it.key()+"\"\r\n");
         post_data.append("\r\n");
@@ -219,6 +222,16 @@ QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
     wait.exec();
     QByteArray answer = reply->readAll();
     reply->deleteLater();
+
+    if(!check_host_to_visit(QUrl(url).host()))
+    {
+        QNetworkCookieJar * cookie = manager->cookieJar();
+        QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
+        set_new_host_and_cookies(QUrl(url).host(),cookies);
+    }
+
+
+    return answer;
 
 
 }
