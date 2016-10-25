@@ -3,7 +3,10 @@
 #include <QDebug>
 
 Tokenizer::Tokenizer(QString str)
-    :html(str) {}
+    :html(str)
+{
+    tree = new Tree;
+}
 
 void Tokenizer::new_html_page(QString new_html)
 {
@@ -34,9 +37,11 @@ void Tokenizer::start_tokenization()
             }
         it++;
     }
+
+    make_tree();
 }
 
-QString::iterator Tokenizer::skip_html_tag(QString::iterator begin, QString::iterator end)
+QString::iterator Tokenizer::skip_html_tag(QString::iterator begin, QString::iterator end) const
 {
     QString::iterator it = begin;
     while(it != end)
@@ -52,7 +57,7 @@ QString::iterator Tokenizer::skip_html_tag(QString::iterator begin, QString::ite
     return it; // end
 }
 
-QString::iterator Tokenizer::skip_text(QString::iterator begin, QString::iterator end)
+QString::iterator Tokenizer::skip_text(QString::iterator begin, QString::iterator end) const
 {
     QString::iterator it = begin;
     while(it != end)
@@ -73,7 +78,9 @@ void Tokenizer::open_tag_token(QString::iterator begin, QString::iterator end)
     QString::iterator it = begin;
 
     Token_type type = START_TAG;
-    QString token_name;
+
+    QString tag;
+
 
     while(it != end)
     {
@@ -83,12 +90,12 @@ void Tokenizer::open_tag_token(QString::iterator begin, QString::iterator end)
             it++;
         }
 
-        token_name += *it;
+        tag += *it;
 
         it++;
     }
 
-    tokens.push_back(Token(type,token_name));
+    tokens.push_back(Token(type,tag));
 }
 
 void Tokenizer::text_token(QString::iterator begin, QString::iterator end)
@@ -107,7 +114,15 @@ void Tokenizer::text_token(QString::iterator begin, QString::iterator end)
     tokens.push_back(Token(TEXT,token_name));
 }
 
-void Tokenizer::print_tokens()
+void Tokenizer::make_tree()
+{
+    for(int i = 0; i < tokens.size(); i++)
+    {
+        tree->push(tokens[i].first, tokens[i].second);
+    }
+}
+
+void Tokenizer::print_tokens() const
 {
     for(int i = 0; i < tokens.size(); i++)
     {
