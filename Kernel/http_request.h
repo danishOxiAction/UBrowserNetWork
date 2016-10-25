@@ -18,8 +18,9 @@ class HttpRequest
 {
 public:
 
-    QString get( const QString& url );
     HttpRequest();
+    QString get( const QString& url );
+    QString post(const QString& url,QMap <QString,QString> data);
 
 
 

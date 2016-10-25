@@ -165,6 +165,64 @@ QString HttpRequest::get(const QString &url)
 
 }
 
+QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
+{
+    QNetworkRequest request;
+    QNetworkAccessManager* manager = new QNetworkAccessManager();
+    QNetworkReply* reply;
+    QString boundary = "1BEF0A57BE110FD467A";
+    QByteArray post_data;
+
+    post_data.append("\r\n");
+
+    for(QMap <QString, QString>::iterator it = data.begin();it !=data.end(); ++it)
+    {
+
+        post_data.append("--" + boundary + "\r\n");
+        post_data.append("Content-Disposition: form-data; name=\""+it.key()+"\"\r\n");
+        post_data.append("\r\n");
+        post_data.append(it.value()+ "\r\n");
+    }
+    post_data.append("--" + boundary + "--" + "\r\n");
+
+    QByteArray host;
+    host.append(QUrl(url).host());
+
+    QByteArray type;
+    type.append( "multipart/form-data; boundary="+boundary+"" );
+
+    QByteArray length;
+    length.append( QString::number( post_data.length() ) );
+
+    request.setUrl( QUrl(url) );
+    request.setRawHeader("Host", host );
+    request.setRawHeader("Referer", host );
+    if(check_host_to_visit(QUrl(url).host()))
+    {
+        QByteArray cook=get_cookie_by_host(QUrl(url).host());
+        request.setRawHeader("Cookie", cook);
+    }
+    else
+    {
+        request.setRawHeader("Cookie", "income=1");
+    }
+    request.setRawHeader("Content-Type", type );
+    request.setRawHeader("Content-Length", length );
+
+
+    reply = manager->post(request,post_data);
+    QEventLoop wait;
+    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), &wait, SLOT(quit()));
+    QTimer::singleShot(300000, &wait, SLOT(quit()));
+
+    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), manager, SLOT(deleteLater()));
+    wait.exec();
+    QByteArray answer = reply->readAll();
+    reply->deleteLater();
+
+
+}
+
 
 
 //QString HttpRequest::get_host_by_url(QString url)
