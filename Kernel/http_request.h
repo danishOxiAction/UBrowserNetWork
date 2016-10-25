@@ -19,8 +19,9 @@ class HttpRequest
 public:
 
     HttpRequest();
-    QString get( const QString& url );
+    QString get( const QString& url,QMap <QString,QString> data );
     QString post(const QString& url,QMap <QString,QString> data);
+
 
 
 
@@ -34,6 +35,7 @@ protected:
     QByteArray get_cookie_by_host(QString);
     QByteArray get_cookie_from_file(QString);
     QNetworkReply* get_reply_by_request(QNetworkRequest&,QNetworkAccessManager*);
+    void add_url_in_the_history(QString url);
 };
 
 #endif // HTTPREQUEST_H

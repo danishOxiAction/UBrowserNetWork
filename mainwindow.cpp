@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMap>
+#include <QDateTime>
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -18,6 +21,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
+
     HttpRequest request;
     QString html;
     if(   !((ui->lineEdit_name1->text().isEmpty()) && (ui->lineEdit_value1->text().isEmpty()))  )
@@ -32,12 +36,15 @@ void MainWindow::on_pushButton_clicked()
         }
         else
         {
-          html =  request.get(ui->lineEdit->text() );
+            QMap<QString,QString> data;
+            data[ui->lineEdit_name1->text()]=ui->lineEdit_value1->text();
+          html =  request.get(ui->lineEdit->text(),data );
         }
     }
     else
     {
-        html =  request.get(ui->lineEdit->text() );
+        QMap<QString,QString> data;
+        html =  request.get(ui->lineEdit->text(),data);
 
     }
 

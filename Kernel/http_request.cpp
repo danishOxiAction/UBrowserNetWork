@@ -14,8 +14,14 @@ QMap <QString,QByteArray> HttpRequest::last_hosts_with_cookies;
 //++ структурировать get, вынести часть запроса в функцию: принимает QNetworkRequest request
 //++ и QNetworkAccessManager* manager, возвращает QNetworkReply* reply
 
-// добавить datd для get
+//++ добавить data для get
 // сохранение новых куки с вымищением старых
+
+// SQLite -- если будет время | статья Qt и SQLite
+// возвращать куку как QMap<QString,QVector<QString>> в векторе разбито на имя = значение
+// история возвращает как QData,QString
+
+
 HttpRequest::HttpRequest()
 {
     QFile cookiesfile("Cookies");
@@ -131,16 +137,47 @@ QNetworkReply *HttpRequest::get_reply_by_request(QNetworkRequest& request, QNetw
     return reply;
 }
 
-
-QString HttpRequest::get(const QString &url)
+void HttpRequest::add_url_in_the_history(QString url)
 {
-    
+    QDateTime dt = QDateTime::currentDateTime();
+    qDebug() << dt.toString();
+    QFile history("History");
+    if(history.open(QFile::Append | QFile::Text))
+    {
+        QTextStream out(&history);
+        QString item = dt.toString() + '|' + url + "\n";
+        out << item;
+    }
+    else
+    {
+        //throw;
+    }
+    history.close();
+
+}
+
+
+QString HttpRequest::get(const QString &url, QMap <QString,QString> data)
+{
+    QString url_prm(url);
+    for(QMap<QString,QString>::iterator it=data.begin();it!=data.end();++it)
+    {
+        if(!url_prm.contains("?"))
+        {
+            url_prm += "?";
+        }
+        else
+        {
+            url_prm += "&";
+        }
+        url_prm +=it.key() + "=" + it.value();
+    }
     
     QNetworkRequest request;
     QNetworkAccessManager* manager = new QNetworkAccessManager();
     QNetworkReply* reply;
 
-    request.setUrl( QUrl(url) );
+    request.setUrl( QUrl(url_prm) );
     if(check_host_to_visit(QUrl(url).host()))// проверяем посещали ли мы этот хост
     {
         QByteArray cook=get_cookie_by_host(QUrl(url).host()); // если да, выгружагем куку
@@ -152,7 +189,7 @@ QString HttpRequest::get(const QString &url)
         reply = get_reply_by_request(request,manager); // совершаем запрос
 
         QNetworkCookieJar * cookie = manager->cookieJar();
-        QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
+        QList<QNetworkCookie>  cookies = cookie->cookiesForUrl(QUrl(url_prm) );
 
 
         set_new_host_and_cookies(QUrl(url).host(),cookies); // выгружаем куку и сохраняем ее
@@ -163,6 +200,7 @@ QString HttpRequest::get(const QString &url)
     QByteArray answer = reply->readAll();
     reply->deleteLater();
     
+    add_url_in_the_history(url_prm);
     return answer;
 
 }
@@ -230,7 +268,7 @@ QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
         set_new_host_and_cookies(QUrl(url).host(),cookies);
     }
 
-
+    add_url_in_the_history(url);
     return answer;
 
 
