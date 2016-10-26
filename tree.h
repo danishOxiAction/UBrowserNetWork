@@ -26,7 +26,7 @@ public:
     Node* now;
     Node* root;
 
-    Node*                   search_node(Node*, const QString&);
+    void                    search_node(Node*, const QString&);
     void                    push_open_or_close_tag(Token_type, const QString&);
     void                    push_text_tag(const QString&);
 public:

@@ -1,17 +1,15 @@
 #include "tree.h"
 
-Tree::Node* Tree::search_node(Node* node, const QString& name)
+void Tree::search_node(Node* node, const QString& name)
 {
     if(node->tag_name == name)
     {
-        return node->parent;
+        now = node->parent;
     }
     else
     {
         search_node(node->parent,name);
     }
-
-   // return nullptr;
 }
 
 Tree::Tree()
@@ -45,65 +43,7 @@ void Tree::push(Token_type type, const QString& tag)
     if(type == TEXT)
         push_text_tag(tag);
     else
-        push_open_or_close_tag(type, tag);
-
-//    switch (type)
-//    {
-//    case START_TAG:
-//    {
-//        QPair<QString,QString> _tag = cut_on_name_and_attributes(tag);
-//        if(root == nullptr)
-//        {
-//            root = new Node;
-
-//            root->parent = nullptr;
-//            root->tag_name = _tag.first;
-//            root->attributes = _tag.second;
-
-//            now = root;
-//        }
-//        else
-//        {
-//            now->child.push_front(new Node);
-
-//            Node* temp = now->child.front();
-
-//            temp->parent = now;
-//            temp->tag_name = _tag.first;
-//            temp->attributes = _tag.second;
-
-//            now = temp;
-
-//            temp = nullptr;
-//        }
-//        break;
-//    }
-//    case END_TAG:
-//    {
-//        QPair<QString,QString> _tag = cut_on_name_and_attributes(tag);
-
-//        now = search_node(now, _tag.first);
-
-//        break;
-//    }
-//    case TEXT:
-//    {
-//        now->child.push_front(new Node);
-
-//        Node* temp = now->child.front();
-
-//        temp->parent = now;
-//        temp->tag_name = tag;
-
-//        now = temp;
-
-//        temp = nullptr;
-
-//        break;
-//    }
-//    default:
-//        break;
-//    }
+        push_open_or_close_tag(type,tag);
 }
 
 void Tree::push_open_or_close_tag(Token_type type, const QString & tag)
@@ -139,7 +79,7 @@ void Tree::push_open_or_close_tag(Token_type type, const QString & tag)
     }
     else // END_TAG
     {
-        now = search_node(now, _tag.first);
+        search_node(now, _tag.first);
     }
 }
 
