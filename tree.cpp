@@ -1,5 +1,5 @@
 #include "tree.h"
-
+#include <QTextStream>
 void Tree::search_node(Node* node, const QString& name)
 {
     if(node->tag_name == name)
@@ -10,6 +10,59 @@ void Tree::search_node(Node* node, const QString& name)
     {
         search_node(node->parent,name);
     }
+}
+
+Tree::Attribute Tree::parse_attributes(const QString& attr)
+{
+    QTextStream s(stdout);
+    s << attr << "\n";
+
+    enum Condition {NONE    = 0,
+                    NAME    = 1,
+                    VALUE   = 2};
+    Condition condition = NONE;
+
+    auto it = attr.begin();
+
+    Attribute attributes;
+
+    QString name;
+    QString value;
+
+    while(it != attr.end())
+    {
+        if(it->isLetter() && condition == NONE)
+        {
+            condition = NAME;
+        }
+        else if(*it == '"' && condition == NAME)
+        {
+            condition = VALUE;
+            ++it;
+        }
+        else if(*it == '"' && condition == VALUE)
+            condition = NONE;
+
+
+
+        if( (*it == ' ' || (it+1) == attr.end() ) && condition == NONE)
+        {
+            attributes.insert(name,value);
+            name = "";
+            value = "";
+        }
+
+        if(condition == NAME) name += *it;
+        if(condition == VALUE) value += *it;
+
+        it++;
+
+        if(*it == '=') ++it;
+    }
+
+    attributes.erase(attributes.find("")); // WTF?
+
+    return attributes;
 }
 
 Tree::Tree()
@@ -40,25 +93,20 @@ QPair<QString, QString> Tree::cut_on_name_and_attributes(const QString& tag)
 
 void Tree::push(Token_type type, const QString& tag)
 {
-    if(type == TEXT)
-        push_text_tag(tag);
-    else
-        push_open_or_close_tag(type,tag);
-}
-
-void Tree::push_open_or_close_tag(Token_type type, const QString & tag)
-{
-    QPair<QString,QString> _tag = cut_on_name_and_attributes(tag);
-
-    if(type == START_TAG)
+    switch (type)
     {
+    case START_TAG:
+    {
+        QPair<QString,QString> _tag = cut_on_name_and_attributes(tag);
+
         if(root == nullptr)
         {
             root = new Node;
 
             root->parent = nullptr;
             root->tag_name = _tag.first;
-            root->attributes = _tag.second;
+            if(_tag.second != "")
+                root->attributes = parse_attributes(_tag.second);
 
             now = root;
         }
@@ -70,29 +118,35 @@ void Tree::push_open_or_close_tag(Token_type type, const QString & tag)
 
             temp->parent = now;
             temp->tag_name = _tag.first;
-            temp->attributes = _tag.second;
+            if(_tag.second != "")
+                temp->attributes = parse_attributes(_tag.second);
 
             now = temp;
 
             temp = nullptr;
         }
+        break;
     }
-    else // END_TAG
+    case END_TAG:
     {
+        QPair<QString,QString> _tag = cut_on_name_and_attributes(tag);
         search_node(now, _tag.first);
+        break;
     }
-}
+    case TEXT:
+    {
+        now->child.push_front(new Node);
 
-void Tree::push_text_tag(const QString& tag)
-{
-    now->child.push_front(new Node);
+        Node* temp = now->child.front();
 
-    Node* temp = now->child.front();
+        temp->parent = now;
+        temp->tag_name = tag;
 
-    temp->parent = now;
-    temp->tag_name = tag;
+        now = temp;
 
-    now = temp;
-
-    temp = nullptr;
+        temp = nullptr;
+    }
+    default:
+        break;
+    }
 }
