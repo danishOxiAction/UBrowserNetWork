@@ -31,9 +31,7 @@ void Tokenizer::start_tokenization()
                 QString::iterator c = skip_text(it, html.end());
                 text_token(it,c);
 
-                /* text_token возвращает итератор на '<' и чтобы не потерять
-                 * тег, после итерации в цикле, уменьшаем его на 1 */
-                it = --c;
+                it = --c; // чтобы не потерять тег
             }
         it++;
     }
@@ -100,6 +98,7 @@ void Tokenizer::open_tag_token(QString::iterator begin, QString::iterator end)
             }
         }
 
+        if(*it == '!' && it == begin)   return; // комменты, DOCTYPE etc
 
         tag += *it;
 
