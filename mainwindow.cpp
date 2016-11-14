@@ -47,6 +47,7 @@ void MainWindow::on_pushButton_clicked()
         html =  request.get(ui->lineEdit->text(),data);
 
     }
+//    html=request.get_image(ui->lineEdit->text());
 
     //      qDebug() << ui->lineEdit_name1->text();
     //      QString html = HttpRequest::get(ui->lineEdit->text() );

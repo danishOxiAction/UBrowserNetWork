@@ -21,6 +21,7 @@ public:
     HttpRequest();
     QString get( const QString& url,QMap <QString,QString> data );
     QString post(const QString& url,QMap <QString,QString> data);
+    QString get_image(const QString& url);
 
 
 
@@ -32,6 +33,7 @@ protected:
     static void set_new_host_and_cookies(QString,QList<QNetworkCookie>&);
     //static QString get_host_by_url(QString url); //получение host по url
     static bool check_host_to_visit(QString);
+    QString get_image_name_by_url(const QString &url);
     QByteArray get_cookie_by_host(QString);
     QByteArray get_cookie_from_file(QString);
     QNetworkReply* get_reply_by_request(QNetworkRequest&,QNetworkAccessManager*);

@@ -1,7 +1,9 @@
 #include "http_request.h"
 #include <QDateTime>
 #include <QTextStream>
-
+#include <QDataStream>
+#include <QImage>
+#include <QDir>
 //QList<QString> HttpRequest::last_host;
 QMap <QString,QByteArray> HttpRequest::last_hosts_with_cookies;
 
@@ -52,6 +54,9 @@ bool HttpRequest::check_host_to_visit(QString host)
     }
     return false;
 }
+
+
+
 
 
 QByteArray HttpRequest::get_cookie_from_file(QString host)
@@ -271,7 +276,62 @@ QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
     add_url_in_the_history(url);
     return answer;
 
+    
+}
 
+
+QString HttpRequest::get_image_name_by_url(const QString &url)
+{
+        QString name(url);
+
+        int index(0);
+        for(int i(0);i<name.size();i++)
+        {
+            if(name[i]=='/')
+            {
+                index=i;
+            }
+        }
+
+        return name.mid(index+1,name.size());
+}
+
+QString HttpRequest::get_image(const QString &url)
+{
+    QNetworkRequest request;
+    QNetworkAccessManager* manager = new QNetworkAccessManager();
+    QNetworkReply* reply;
+    request.setUrl(QUrl(url));
+    
+    reply = get_reply_by_request(request,manager);
+    QByteArray answer = reply->readAll();
+    reply->deleteLater();
+
+    QImage image;
+    image.loadFromData(answer);
+    if(image.save("image/"+get_image_name_by_url(url)))//пытаемся сохранить картинку
+    {
+
+    return "image/"+get_image_name_by_url(url);
+    }
+    else //если нельзя
+    {
+        QDir().mkdir("image"); //пытаемся решить проблему создав каталог
+        if(image.save("image/"+get_image_name_by_url(url)))// и пробуем снова
+        {
+
+        return "image/"+get_image_name_by_url(url);
+        }
+        else
+        {
+            return "error"; //throw;
+        }
+    }
+
+    
+
+    
+    
 }
 
 
