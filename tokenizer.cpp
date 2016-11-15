@@ -139,3 +139,8 @@ void Tokenizer::print_tokens() const
         qDebug() << "Type: " << tokens[i].first << "; Name: " << tokens[i].second << endl;
     }
 }
+
+QString Tokenizer::print_tree() const
+{
+    return tree->print_tree();
+}

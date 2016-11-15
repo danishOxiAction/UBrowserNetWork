@@ -18,9 +18,9 @@ public:
     QList< Token > tokens;
 
     Tree* tree;
-
 public:
     Tokenizer(QString = "");
+
     void                    new_html_page(QString);
     void                    start_tokenization();
     QString::iterator       skip_html_tag(QString::iterator, QString::iterator) const;
@@ -31,6 +31,7 @@ public:
     void                    make_tree();
 
     void                    print_tokens() const;
+    QString                 print_tree() const;
 };
 
 #endif // TOKENIZER_H

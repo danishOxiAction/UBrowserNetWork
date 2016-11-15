@@ -1,5 +1,5 @@
 #include "tree.h"
-#include <QTextStream>
+
 void Tree::search_node(Node* node, const QString& name)
 {
     if(node->tag_name == name)
@@ -14,9 +14,6 @@ void Tree::search_node(Node* node, const QString& name)
 
 Tree::Attribute Tree::parse_attributes(const QString& attr)
 {
-    QTextStream s(stdout);
-    s << attr << "\n";
-
     enum Condition {NONE    = 0,
                     NAME    = 1,
                     VALUE   = 2};
@@ -148,5 +145,45 @@ void Tree::push(Token_type type, const QString& tag)
     }
     default:
         break;
+    }
+}
+
+QString Tree::print_tree()
+{
+    QString* tree = new QString;
+    _print_tree(tree, root, 0);
+
+    return *tree;
+}
+
+//
+//--------------------------Public Methods-------------------------
+//
+
+void Tree::_print_tree(QString* tree, Node* node, int level) const
+{
+    if(node == nullptr) return;
+
+    for(int i = 0; i < level; i++)
+    {
+        *tree += "_";
+    }
+    *tree += node->tag_name + "\n";
+
+    if(!node->attributes.isEmpty())
+    {
+        for(auto it = node->attributes.begin(); it != node->attributes.end(); it++)
+        {
+            for(int i = 0; i <= level; i++)
+            {
+                *tree += " ";
+            }
+            *tree += it.key() + " = " + it.value() + "\n";
+        }
+    }
+
+    for(int i = 0; i < node->child.size(); i++)
+    {
+        _print_tree(tree, node->child[i], level+1);
     }
 }

@@ -1,6 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "Kernel/http_request.h"
+#include "tokenizer.h"
+
 #include <QMainWindow>
 #include <QNetworkAccessManager>
 #include <QNetworkAccessManager>
@@ -12,8 +15,6 @@
 #include <QNetworkCookie>
 #include <QNetworkCookieJar>
 #include <QTextCodec>
-
-#include "Kernel/http_request.h"
 
 namespace Ui {
 class MainWindow;
@@ -29,10 +30,10 @@ public:
 
 private slots:
 
-
     void on_pushButton_clicked();
-
 private:
+    Tokenizer tokenizer;
+
     Ui::MainWindow *ui;
 };
 

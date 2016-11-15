@@ -28,11 +28,15 @@ public:
 
     void                    search_node(Node*, const QString&);
     Attribute               parse_attributes(const QString&);
+
+    void                    _print_tree(QString*, Node*, int) const;
 public:
     Tree();
 
     QPair<QString,QString>  cut_on_name_and_attributes(const QString&);
     void                    push(Token_type, const QString&);
+
+    QString                 print_tree();
 };
 
 #endif // TREE_H
