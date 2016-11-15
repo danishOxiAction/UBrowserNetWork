@@ -54,7 +54,15 @@ void MainWindow::on_pushButton_clicked()
     //      HttpRequest request;
     //      QString html =  request.get(ui->lineEdit->text() );
 
-    ui->plainTextEdit->setPlainText( html );
+
+
+    //request.clear_the_history();
+//    QMap<QDateTime,QString> history(request.get_history());
+//    for(QMap<QDateTime,QString>::Iterator it = history.begin();it!=history.end();++it)
+//    {
+//        qDebug() << it.key() << " " << it.value() <<"\n";
+//    }
+     ui->plainTextEdit->setPlainText( html );
 
 }
 
