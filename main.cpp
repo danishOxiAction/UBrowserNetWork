@@ -33,6 +33,9 @@ int main(int argc, char *argv[])
 //        qDebug() << "File is not open";
 //    }
 
+
+
+
     window.show();
 
     return app.exec();

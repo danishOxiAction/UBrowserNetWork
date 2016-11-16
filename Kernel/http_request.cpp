@@ -47,7 +47,7 @@ HttpRequest::HttpRequest()
 
 bool HttpRequest::check_host_to_visit(QString host)
 {
-    for( QMap<QString,QByteArray>::iterator it =list_hosts_with_cookies.begin();it!=list_hosts_with_cookies.end();++it)
+    for( auto it =list_hosts_with_cookies.begin();it!=list_hosts_with_cookies.end();++it)
     {
         if(it.key()==host)
         {
@@ -55,6 +55,55 @@ bool HttpRequest::check_host_to_visit(QString host)
         }
     }
     return false;
+}
+
+int HttpRequest::get_qty_pair_name_value(QByteArray str)
+{
+    int qty(0); //определяем количество пар name=value
+    for(int i(0);i<str.size();i++)
+    {
+        if(str[i]==';')
+        {
+            qty++;
+        }
+    }
+    return qty;
+
+
+
+}
+//разделить проверку ключа и редактирование файла
+QByteArray remove_part_by_key(QList<QString> list,QByteArray begin,QByteArray text)
+{
+        QByteArray now=text.left(text.indexOf('\n'));
+        //list.front().toUtf8()
+        QByteArray key = now.left(now.indexOf('|'));
+        bool flag(true);
+        for(int i(0);i<list.size();i++)
+        {
+            if(key==list.at(i).toUtf8())
+            {
+                flag=false;
+                begin+="";
+                text=text.mid(text.indexOf('\n')+1,text.size());
+            }
+        }
+        if(flag)
+        {
+            begin+=now;
+            text=text.mid(text.indexOf('\n')+1,text.size());
+
+        }
+
+        if(text=="")
+        {
+            return begin;
+        }
+        else
+        {
+            return remove_part_by_key(list,begin,text);
+        }
+
 }
 
 
@@ -110,39 +159,36 @@ void HttpRequest::clear_the_cookies()
     QFile("Cookies").remove();
 }
 
-//potom
-//QMap<QString, QVector<QString> > HttpRequest::get_cookies()
-//{
-//    QMap<QString, QVector<QString> > list_cookies;
-//    QFile cookies("Cookies");
-//    if(cookiesfile.open(QFile::ReadOnly | QFile::Text))
-//    {
-//        while(!cookiesfile.atEnd())
-//        {
-//            QByteArray cookie = cookiesfile.readLine();
-//            QByteArray _host = cookie.left(cookie.indexOf('|'));
-//            cookie=cookie.mid(cookie.indexOf('|')+1,(cookie.size()-1));
-//            QVector<QString> cook;
-//            while (cookie.indexOf(';')!=(cookie.size()-1))
-//            {
-//                cook.push_back();
-//            }
+QMap<QString, QVector<QString> > HttpRequest::get_cookies()
+{
+    QMap<QString, QVector<QString> > list_cookies;
+    QFile cookiesfile("Cookies");
+    if(cookiesfile.open(QFile::ReadOnly | QFile::Text))
+    {
+        while(!cookiesfile.atEnd())
+        {
+            QByteArray cookie = cookiesfile.readLine();
+            QByteArray _host = cookie.left(cookie.indexOf('|'));
+            cookie=cookie.mid(cookie.indexOf('|')+1,(cookie.size()-1));
+            int qty(get_qty_pair_name_value(cookie)); //определяем количество пар name=value
+            QVector<QString> cook(qty);
 
+            for(int i(0);i<cook.size();i++)
+            {
+                cook[i]=cookie.left(cookie.indexOf(';'));
+                cookie=cookie.mid((cookie.indexOf(';')+1),cookie.size());
+            }
+            list_cookies[_host]=cook;
 
-
-
-//        }
-//        else
-//        {
-//            //throw;
-//        }
-//    }
-//    else
-//    {
-//        //throw;
-//    }
-//    cookiesfile.close();
-//}
+        }
+    }
+    else
+    {
+        //throw;
+    }
+    cookiesfile.close();
+    return list_cookies;
+}
 
 
 
@@ -209,22 +255,17 @@ QByteArray HttpRequest::swap_cookies_by_host(QByteArray txt_begin,QByteArray txt
 
 }
 
+
 //декомпозировать! и сделать более наглядной!
 void HttpRequest::check_the_relevance_cookies(QString host, QList<QNetworkCookie> & cookies)
 {
     QByteArray tmp_cook = list_hosts_with_cookies[host];
-    int size(0); //определяем количество пар name=value
-    for(int i(0);i<tmp_cook.size();i++)
-    {
-        if(tmp_cook[i]==';')
-        {
-            size++;
-        }
-    }
+    int qty(get_qty_pair_name_value(tmp_cook)); //определяем количество пар name=value
+
     QList<QPair<QByteArray,QByteArray> > tmp_cook_list;
 
     //заполняем ими список
-    for(int i(0);i<size;i++)
+    for(int i(0);i<qty;i++)
     {
         QByteArray tmp=tmp_cook.left(tmp_cook.indexOf(';'));
         QByteArray _name=tmp.left(tmp.indexOf('='));
@@ -243,7 +284,7 @@ void HttpRequest::check_the_relevance_cookies(QString host, QList<QNetworkCookie
     for(int i(0);i<cookies.size();i++)
     {
         bool flage(true); // флаг является ли кука с данным именем новой
-        for(int j(0);j<size;j++)
+        for(int j(0);j<qty;j++)
         {
             if(tmp_cook_list.at(j).first==cookies.at(i).name())
             {
@@ -281,7 +322,6 @@ void HttpRequest::check_the_relevance_cookies(QString host, QList<QNetworkCookie
         {
 
             txt =cookiefile.readAll(); //считали куку
-            //qDebug() << txt;
             txt=swap_cookies_by_host("",txt,host,list_hosts_with_cookies[host]); //внесли изменения
 
 
@@ -401,6 +441,19 @@ QString HttpRequest::get(const QString &url, QMap <QString,QString> data)
 
 }
 
+QNetworkReply *HttpRequest::post_reply_by_request(QNetworkRequest &request, QNetworkAccessManager *manager,QByteArray post_data)
+{
+    QNetworkReply* reply= manager->post(request,post_data);
+    QEventLoop wait;
+    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), &wait, SLOT(quit()));
+    QTimer::singleShot(300000, &wait, SLOT(quit()));
+
+    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), manager, SLOT(deleteLater()));
+    wait.exec();
+    return reply;
+
+}
+
 QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
 {
     QNetworkRequest request;
@@ -434,50 +487,37 @@ QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
     request.setUrl( QUrl(url) );
     request.setRawHeader("Host", host );
     request.setRawHeader("Referer", host );
+
     if(check_host_to_visit(QUrl(url).host()))
     {
         QByteArray cook=get_cookie_by_host(QUrl(url).host());
         request.setRawHeader("Cookie", cook);
+        request.setRawHeader("Content-Type", type );
+        request.setRawHeader("Content-Length", length );
+        reply = post_reply_by_request(request,manager,post_data);
+        QNetworkCookieJar * cookie = manager->cookieJar();
+        QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
+        check_the_relevance_cookies(QUrl(url).host(),cookies);
+
     }
     else
     {
         request.setRawHeader("Cookie", "income=1");
-    }
-    request.setRawHeader("Content-Type", type );
-    request.setRawHeader("Content-Length", length );
-
-
-    reply = manager->post(request,post_data);
-    QEventLoop wait;
-    QNetworkCookieJar * cookie = manager->cookieJar();
-    QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
-    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), &wait, SLOT(quit()));
-    QTimer::singleShot(300000, &wait, SLOT(quit()));
-
-    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), manager, SLOT(deleteLater()));
-    wait.exec();
-    QByteArray answer = reply->readAll();
-    reply->deleteLater();
-
-
-
-    if(!check_host_to_visit(QUrl(url).host()))
-    {
+        request.setRawHeader("Content-Type", type );
+        request.setRawHeader("Content-Length", length );
+        reply = post_reply_by_request(request,manager,post_data);
         QNetworkCookieJar * cookie = manager->cookieJar();
         QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
         set_new_host_and_cookies(QUrl(url).host(),cookies);
     }
-    else
-    {
-        QNetworkCookieJar * cookie = manager->cookieJar();
-        QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
-        check_the_relevance_cookies(QUrl(url).host(),cookies);
-    }
 
+
+    QByteArray answer = reply->readAll();
+    reply->deleteLater();
     add_url_in_the_history(url);
     return answer;
 
-    
+
 }
 
 

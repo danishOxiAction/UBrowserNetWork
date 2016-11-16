@@ -31,8 +31,11 @@ public:
 private slots:
 
     void on_pushButton_clicked();
+    //void on_ck_clicked();
 private:
     Tokenizer tokenizer;
+    HttpRequest request;
+
 
     Ui::MainWindow *ui;
 };
