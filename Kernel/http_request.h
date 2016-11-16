@@ -25,7 +25,8 @@ public:
     QString get_image(const QString& url);
     void clear_the_history();
     QMap<QDateTime, QString> get_history();
-
+    void clear_the_cookies();
+   // QMap<QString, QVector<QString > > get_cookies();
 
 
 

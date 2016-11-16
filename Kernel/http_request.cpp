@@ -105,6 +105,45 @@ QMap<QDateTime, QString> HttpRequest::get_history()
     return list_history;
 }
 
+void HttpRequest::clear_the_cookies()
+{
+    QFile("Cookies").remove();
+}
+
+//potom
+//QMap<QString, QVector<QString> > HttpRequest::get_cookies()
+//{
+//    QMap<QString, QVector<QString> > list_cookies;
+//    QFile cookies("Cookies");
+//    if(cookiesfile.open(QFile::ReadOnly | QFile::Text))
+//    {
+//        while(!cookiesfile.atEnd())
+//        {
+//            QByteArray cookie = cookiesfile.readLine();
+//            QByteArray _host = cookie.left(cookie.indexOf('|'));
+//            cookie=cookie.mid(cookie.indexOf('|')+1,(cookie.size()-1));
+//            QVector<QString> cook;
+//            while (cookie.indexOf(';')!=(cookie.size()-1))
+//            {
+//                cook.push_back();
+//            }
+
+
+
+
+//        }
+//        else
+//        {
+//            //throw;
+//        }
+//    }
+//    else
+//    {
+//        //throw;
+//    }
+//    cookiesfile.close();
+//}
+
 
 
 QByteArray HttpRequest::get_cookie_from_file(QString host)
@@ -242,7 +281,7 @@ void HttpRequest::check_the_relevance_cookies(QString host, QList<QNetworkCookie
         {
 
             txt =cookiefile.readAll(); //считали куку
-            qDebug() << txt;
+            //qDebug() << txt;
             txt=swap_cookies_by_host("",txt,host,list_hosts_with_cookies[host]); //внесли изменения
 
 
@@ -410,6 +449,8 @@ QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
 
     reply = manager->post(request,post_data);
     QEventLoop wait;
+    QNetworkCookieJar * cookie = manager->cookieJar();
+    QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
     QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), &wait, SLOT(quit()));
     QTimer::singleShot(300000, &wait, SLOT(quit()));
 
@@ -418,11 +459,19 @@ QString HttpRequest::post(const QString &url, QMap<QString, QString> data)
     QByteArray answer = reply->readAll();
     reply->deleteLater();
 
+
+
     if(!check_host_to_visit(QUrl(url).host()))
     {
         QNetworkCookieJar * cookie = manager->cookieJar();
         QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
         set_new_host_and_cookies(QUrl(url).host(),cookies);
+    }
+    else
+    {
+        QNetworkCookieJar * cookie = manager->cookieJar();
+        QList<QNetworkCookie>  cookies = cookie->cookiesForUrl( QUrl(url) );
+        check_the_relevance_cookies(QUrl(url).host(),cookies);
     }
 
     add_url_in_the_history(url);

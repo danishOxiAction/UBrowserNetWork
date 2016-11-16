@@ -150,25 +150,24 @@ void Tree::push(Token_type type, const QString& tag)
 
 QString Tree::print_tree()
 {
-    QString* tree = new QString;
+    QString tree = "";
     _print_tree(tree, root, 0);
-
-    return *tree;
+    return tree;;
 }
 
 //
 //--------------------------Public Methods-------------------------
 //
 
-void Tree::_print_tree(QString* tree, Node* node, int level) const
+void Tree::_print_tree(QString& tree, Node* node, int level) const
 {
     if(node == nullptr) return;
 
     for(int i = 0; i < level; i++)
     {
-        *tree += "_";
+        tree += "_";
     }
-    *tree += node->tag_name + "\n";
+    tree += node->tag_name + "\n";
 
     if(!node->attributes.isEmpty())
     {
@@ -176,9 +175,9 @@ void Tree::_print_tree(QString* tree, Node* node, int level) const
         {
             for(int i = 0; i <= level; i++)
             {
-                *tree += " ";
+                tree += " ";
             }
-            *tree += it.key() + " = " + it.value() + "\n";
+            tree += it.key() + " = " + it.value() + "\n";
         }
     }
 

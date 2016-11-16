@@ -11,6 +11,10 @@ Tokenizer::Tokenizer(QString str)
 void Tokenizer::new_html_page(QString new_html)
 {
     html = new_html;
+
+    tokens.clear();
+    delete tree;
+    tree = new Tree;
 }
 
 void Tokenizer::start_tokenization()
@@ -132,12 +136,14 @@ void Tokenizer::make_tree()
     }
 }
 
-void Tokenizer::print_tokens() const
+QString Tokenizer::print_tokens() const
 {
+    QString _tokens = "";
     for(int i = 0; i < tokens.size(); i++)
     {
-        qDebug() << "Type: " << tokens[i].first << "; Name: " << tokens[i].second << endl;
+        _tokens += tokens[i].second + "\n";
     }
+    return _tokens;
 }
 
 QString Tokenizer::print_tree() const

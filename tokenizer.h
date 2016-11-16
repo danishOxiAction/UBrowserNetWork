@@ -30,7 +30,7 @@ public:
 
     void                    make_tree();
 
-    void                    print_tokens() const;
+    QString                 print_tokens() const;
     QString                 print_tree() const;
 };
 
