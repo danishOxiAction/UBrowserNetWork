@@ -1,71 +1,18 @@
 #include "tree.h"
 
-void Tree::search_node(Node* node, const QString& name)
-{
-    if(node->tag_name == name)
-    {
-        now = node->parent;
-    }
-    else
-    {
-        search_node(node->parent,name);
-    }
-}
-
-Tree::Attribute Tree::parse_attributes(const QString& attr)
-{
-    enum Condition {NONE    = 0,
-                    NAME    = 1,
-                    VALUE   = 2};
-    Condition condition = NONE;
-
-    auto it = attr.begin();
-
-    Attribute attributes;
-
-    QString name;
-    QString value;
-
-    while(it != attr.end())
-    {
-        if(it->isLetter() && condition == NONE)
-        {
-            condition = NAME;
-        }
-        else if(*it == '"' && condition == NAME)
-        {
-            condition = VALUE;
-            ++it;
-        }
-        else if(*it == '"' && condition == VALUE)
-            condition = NONE;
-
-
-
-        if( (*it == ' ' || (it+1) == attr.end() ) && condition == NONE)
-        {
-            attributes.insert(name,value);
-            name = "";
-            value = "";
-        }
-
-        if(condition == NAME) name += *it;
-        if(condition == VALUE) value += *it;
-
-        it++;
-
-        if(*it == '=') ++it;
-    }
-
-    attributes.erase(attributes.find("")); // WTF?
-
-    return attributes;
-}
+#include <QDebug>
 
 Tree::Tree()
 {
     root = nullptr;
     now = nullptr;
+}
+
+Tree::~Tree()
+{
+    free_resources(root);
+
+    root = nullptr;
 }
 
 QPair<QString, QString> Tree::cut_on_name_and_attributes(const QString& tag)
@@ -148,6 +95,13 @@ void Tree::push(Token_type type, const QString& tag)
     }
 }
 
+void Tree::clear()
+{
+    free_resources(root);
+
+    root = nullptr;
+}
+
 QString Tree::print_tree()
 {
     QString tree = "";
@@ -156,8 +110,88 @@ QString Tree::print_tree()
 }
 
 //
-//--------------------------Public Methods-------------------------
+//--------------------------Privat Methods-------------------------
 //
+
+
+void Tree::search_node(Node* node, const QString& name)
+{
+    if(node->tag_name == name)
+    {
+        now = node->parent;
+    }
+    else
+    {
+        search_node(node->parent,name);
+    }
+}
+
+Tree::Attribute Tree::parse_attributes(const QString& attr)
+{
+    enum Condition {NONE    = 0,
+                    NAME    = 1,
+                    VALUE   = 2};
+    Condition condition = NONE;
+
+    auto it = attr.begin();
+
+    Attribute attributes;
+
+    QString name;
+    QString value;
+
+    while(it != attr.end())
+    {
+        if(it->isLetter() && condition == NONE)
+        {
+            condition = NAME;
+        }
+        else if(*it == '"' && condition == NAME)
+        {
+            condition = VALUE;
+            ++it;
+        }
+        else if(*it == '"' && condition == VALUE)
+            condition = NONE;
+
+
+
+        if( (*it == ' ' || (it+1) == attr.end() ) && condition == NONE)
+        {
+            attributes.insert(name,value);
+            name = "";
+            value = "";
+        }
+
+        if(condition == NAME) name += *it;
+        if(condition == VALUE) value += *it;
+
+        it++;
+
+        if(*it == '=') ++it;
+    }
+
+    attributes.erase(attributes.find("")); // WTF?
+
+    return attributes;
+}
+
+
+void Tree::free_resources(Node* node)
+{
+    if(node != nullptr)
+    {
+        node->tag_name = "";
+        node->attributes = Attribute();
+
+        for(auto it = node->child.begin(); it != node->child.end(); ++it)
+            free_resources(*it);
+
+        for(auto it = node->child.begin(); it != node->child.end(); ++it)
+            delete *it;
+    }
+}
+
 
 void Tree::_print_tree(QString& tree, Node* node, int level) const
 {

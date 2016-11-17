@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->lineEdit->setText("http://shotinleg.ru/test/index.php");  //  http://easy-qt.blogspot.ru/
+
+    logs.add_note("New session");
 }
 
 MainWindow::~MainWindow()
@@ -23,23 +25,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-
     QMap<QString,QString> data;
 
-    QString html =  request.get(ui->lineEdit->text(),data);
+    QString html =  request.get(ui->lineEdit->text(),data);   
 
-//    html.replace("\n", "");
-//    html.replace("\t", "");
+    tokenizer.new_html_page(html);
 
-//    tokenizer.new_html_page(html);
-//    tokenizer.start_tokenization();
+    QString tree = tokenizer.print_tree();
 
-//    QString tree = tokenizer.print_tree();
-
-    ui->plainTextEdit->setPlainText(html);
-
-
-
+    ui->plainTextEdit->setPlainText(tree);
 }
 
 //void MainWindow::on_ck_clicked()

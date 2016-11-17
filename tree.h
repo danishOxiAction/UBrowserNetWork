@@ -29,12 +29,16 @@ public:
     void                    search_node(Node*, const QString&);
     Attribute               parse_attributes(const QString&);
 
+    void                    free_resources(Node*);
+
     void                    _print_tree(QString&, Node*, int) const;
 public:
     Tree();
+    ~Tree();
 
     QPair<QString,QString>  cut_on_name_and_attributes(const QString&);
     void                    push(Token_type, const QString&);
+    void                    clear();
 
     QString                 print_tree();
 };

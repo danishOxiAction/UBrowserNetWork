@@ -1,23 +1,32 @@
-#include "tokenizer.h"
+#include "domparser.h"
 
 #include <QDebug>
 
-Tokenizer::Tokenizer(QString str)
+DomParser::DomParser(QString str)
     :html(str)
 {
     tree = new Tree;
 }
 
-void Tokenizer::new_html_page(QString new_html)
+void DomParser::new_html_page(QString new_html)
 {
-    html = new_html;
+    if(html != new_html)
+    {
+        html.replace("\n", "");
+        html.replace("\t", "");
 
-    tokens.clear();
-    delete tree;
-    tree = new Tree;
+        html = new_html;
+
+        tokens.clear();
+        tree->clear();
+
+        tree = new Tree;
+
+        parse();
+    }
 }
 
-void Tokenizer::start_tokenization()
+void DomParser::parse()
 {
     QString::iterator it = html.begin();
 
@@ -43,7 +52,7 @@ void Tokenizer::start_tokenization()
     make_tree();
 }
 
-QString::iterator Tokenizer::skip_html_tag(QString::iterator begin, QString::iterator end) const
+QString::iterator DomParser::skip_html_tag(QString::iterator begin, QString::iterator end) const
 {
     QString::iterator it = begin;
     while(it != end)
@@ -59,7 +68,7 @@ QString::iterator Tokenizer::skip_html_tag(QString::iterator begin, QString::ite
     return it; // end
 }
 
-QString::iterator Tokenizer::skip_text(QString::iterator begin, QString::iterator end) const
+QString::iterator DomParser::skip_text(QString::iterator begin, QString::iterator end) const
 {
     QString::iterator it = begin;
     while(it != end)
@@ -75,7 +84,7 @@ QString::iterator Tokenizer::skip_text(QString::iterator begin, QString::iterato
     return it; // end
 }
 
-void Tokenizer::open_tag_token(QString::iterator begin, QString::iterator end)
+void DomParser::open_tag_token(QString::iterator begin, QString::iterator end)
 {
     QString::iterator it = begin;
 
@@ -112,7 +121,7 @@ void Tokenizer::open_tag_token(QString::iterator begin, QString::iterator end)
     tokens.push_back(Token(type,tag));
 }
 
-void Tokenizer::text_token(QString::iterator begin, QString::iterator end)
+void DomParser::text_token(QString::iterator begin, QString::iterator end)
 {
     QString::iterator it = begin;
 
@@ -128,7 +137,7 @@ void Tokenizer::text_token(QString::iterator begin, QString::iterator end)
     tokens.push_back(Token(TEXT,token_name));
 }
 
-void Tokenizer::make_tree()
+void DomParser::make_tree()
 {
     for(int i = 0; i < tokens.size(); i++)
     {
@@ -136,7 +145,7 @@ void Tokenizer::make_tree()
     }
 }
 
-QString Tokenizer::print_tokens() const
+QString DomParser::print_tokens() const
 {
     QString _tokens = "";
     for(int i = 0; i < tokens.size(); i++)
@@ -146,7 +155,7 @@ QString Tokenizer::print_tokens() const
     return _tokens;
 }
 
-QString Tokenizer::print_tree() const
+QString DomParser::print_tree() const
 {
     return tree->print_tree();
 }

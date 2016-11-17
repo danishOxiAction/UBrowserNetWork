@@ -5,7 +5,7 @@ enum Token_type {TEXT           = 0,
                  START_TAG      = 1,
                  END_TAG        = 2};
 
-class Tokenizer;
+class DomParser;
 
 class Tree;
 

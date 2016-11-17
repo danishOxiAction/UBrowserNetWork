@@ -8,7 +8,7 @@
 #include <QPair>
 #include <QString>
 
-class Tokenizer
+class DomParser
 {
 public:
     typedef QPair<Token_type, QString> Token;
@@ -19,10 +19,10 @@ public:
 
     Tree* tree;
 public:
-    Tokenizer(QString = "");
+    DomParser(QString = "");
 
     void                    new_html_page(QString);
-    void                    start_tokenization();
+    void                    parse();
     QString::iterator       skip_html_tag(QString::iterator, QString::iterator) const;
     QString::iterator       skip_text(QString::iterator, QString::iterator) const;
     void                    open_tag_token(QString::iterator, QString::iterator);
