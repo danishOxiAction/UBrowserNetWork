@@ -11,6 +11,7 @@ public:
     Logs();
 
     void    add_note(const QString&);
+    void  remove_log();
 };
 
 #endif // LOGS_H

@@ -19,18 +19,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    logs.add_note("Successful completion of the session");
     delete ui;
 }
-
 
 void MainWindow::on_pushButton_clicked()
 {
     QMap<QString,QString> data;
 
     QString html =  request.get(ui->lineEdit->text(),data);   
-
     tokenizer.new_html_page(html);
 
+    logs.add_note("test log");
     QString tree = tokenizer.print_tree();
 
     ui->plainTextEdit->setPlainText(tree);

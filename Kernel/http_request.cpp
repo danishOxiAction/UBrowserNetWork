@@ -1,3 +1,4 @@
+#include "logs.h"
 #include "http_request.h"
 #include <QDateTime>
 #include <QTextStream>
@@ -40,6 +41,7 @@ HttpRequest::HttpRequest()
     }
     else
     {
+        Logs().add_note("error: Cookie-file doesn't open when you create the request object");
         //throw;
     }
     cookiesfile.close();
@@ -119,6 +121,8 @@ void HttpRequest::add_url_in_the_history(QString url)
     }
     else
     {
+        Logs().add_note("Error: histori-file does not open when try to write a visit"+url);
+
         //throw;
     }
     history.close();
@@ -148,6 +152,7 @@ QMap<QDateTime, QString> HttpRequest::get_history()
     }
     else
     {
+        Logs().add_note("error: Histori-file doesn't open when try get history");
         //throw;
     }
     history.close();
@@ -197,7 +202,7 @@ QByteArray HttpRequest::get_cookie_from_file(QString host)
     QFile cookiesfile("Cookies");
     if(cookiesfile.open(QFile::ReadOnly | QFile::Text))
     {
-        if(!cookiesfile.atEnd())
+        while(!cookiesfile.atEnd())
         {
             QByteArray cookie = cookiesfile.readLine();
             QByteArray _host = cookie.left(cookie.indexOf('|'));
@@ -209,13 +214,12 @@ QByteArray HttpRequest::get_cookie_from_file(QString host)
             }
             
         }
-        else
-        {
-            //throw;
-        }
+
     }
     else
     {
+        Logs().add_note("Error: Cookies-file does not open when try to write cookies by "+host);
+
         //throw;
     }
     cookiesfile.close();
@@ -328,6 +332,7 @@ void HttpRequest::check_the_relevance_cookies(QString host, QList<QNetworkCookie
         }
         else
         {
+            Logs().add_note("Error: Cookies-file does not open when try rewrite cookies");
             //throw;
         }
         cookiefile.close();
@@ -339,6 +344,7 @@ void HttpRequest::check_the_relevance_cookies(QString host, QList<QNetworkCookie
         }
         else
         {
+            Logs().add_note("Error: Cookies-file does not open when try rewrite cookies");
             //throw;
         }
         cookiefile.close();
@@ -368,7 +374,8 @@ void HttpRequest::set_new_host_and_cookies(QString host, QList<QNetworkCookie>& 
     }
     else
     {
-        //throw;
+        Logs().add_note("Error: Cookies-file does not open when try write cookies");
+       //throw;
     }
     cookiesfile.close();
     
@@ -565,7 +572,9 @@ QString HttpRequest::get_image(const QString &url)
         }
         else
         {
-            return "error"; //throw;
+            Logs().add_note("Error: unable to download the image " +url);
+
+            return "error"; //throw; // дописать возвращение картики Елькин:"ваше изображение не удалось скачать, извините"
         }
     }
 

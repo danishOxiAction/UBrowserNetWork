@@ -19,12 +19,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     Kernel/http_request.cpp \
     tree.cpp \
-    tokenizer.cpp
+    domparser.cpp \
+    logs.cpp
 
 HEADERS  += mainwindow.h \
     Kernel/http_request.h \
     tree.h \
-    tokenizer.h \
-    parser.h
+    parser.h \
+    domparser.h \
+    logs.h
 
 FORMS    += mainwindow.ui
