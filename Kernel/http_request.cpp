@@ -19,11 +19,11 @@ QMap <QString,QByteArray> HttpRequest::list_hosts_with_cookies;
 //++ и QNetworkAccessManager* manager, возвращает QNetworkReply* reply
 
 //++ добавить data для get
-// сохранение новых куки с вымищением старых
+// ++сохранение новых куки с вымищением старых
 
 // SQLite -- если будет время | статья Qt и SQLite
-// возвращать куку как QMap<QString,QVector<QString>> в векторе разбито на имя = значение
-// история возвращает как QData,QString
+// ++возвращать куку как QMap<QString,QVector<QString>> в векторе разбито на имя = значение
+// ++история возвращает как QData,QString
 
 
 HttpRequest::HttpRequest()
@@ -74,39 +74,81 @@ int HttpRequest::get_qty_pair_name_value(QByteArray str)
 
 
 }
-//разделить проверку ключа и редактирование файла
-QByteArray remove_part_by_key(QList<QString> list,QByteArray begin,QByteArray text)
+
+
+void HttpRequest::remove_part_of_the_story(QList<QString> list_story)
 {
-        QByteArray now=text.left(text.indexOf('\n'));
-        //list.front().toUtf8()
-        QByteArray key = now.left(now.indexOf('|'));
-        bool flag(true);
-        for(int i(0);i<list.size();i++)
+    QFile historyfile("History");
+    QByteArray history;
+    if(historyfile.open(QFile::ReadOnly))
+    {
+        history= historyfile.readAll();
+        history=remove_part_by_key(list_story,"",history);
+    }
+    historyfile.close();
+    if(historyfile.open(QFile::WriteOnly))
+    {
+        historyfile.write(history);
+
+    }
+    historyfile.close();
+}
+
+void HttpRequest::remove_part_of_the_cook(QList<QString>list_cookis)
+{
+    QFile cookiesfile("Cookies");
+    QByteArray cookies;
+    if(cookiesfile.open(QFile::ReadOnly))
+    {
+        cookies= cookiesfile.readAll();
+        cookies=remove_part_by_key(list_cookis,"",cookies);
+    }
+    cookiesfile.close();
+    if(cookiesfile.open(QFile::WriteOnly))
+    {
+        cookiesfile.write(cookies);
+
+    }
+    cookiesfile.close();
+    for(int i(0);i<list_cookis.size();i++)
+    {
+    list_hosts_with_cookies.erase(list_hosts_with_cookies.find(list_cookis.at(i)));
+    }
+}
+
+QByteArray HttpRequest::remove_part_by_key(QList<QString> list, QByteArray begin, QByteArray text)
+{
+    QByteArray now=text.left(text.indexOf('\n'));
+    //list.front().toUtf8()
+    QByteArray key = now.left(now.indexOf('|'));
+    bool flag(true);
+    for(int i(0);i<list.size();i++)
+    {
+        if(key==list.at(i).toUtf8())
         {
-            if(key==list.at(i).toUtf8())
-            {
-                flag=false;
-                begin+="";
-                text=text.mid(text.indexOf('\n')+1,text.size());
-            }
-        }
-        if(flag)
-        {
-            begin+=now;
+            flag=false;
+            begin+="";
             text=text.mid(text.indexOf('\n')+1,text.size());
+        }
+    }
+    if(flag)
+    {
+        begin+=now+"\n";
+        text=text.mid(text.indexOf('\n')+1,text.size());
 
-        }
+    }
 
-        if(text=="")
-        {
-            return begin;
-        }
-        else
-        {
-            return remove_part_by_key(list,begin,text);
-        }
+    if(text=="")
+    {
+        return begin;
+    }
+    else
+    {
+        return remove_part_by_key(list,begin,text);
+    }
 
 }
+
 
 
 void HttpRequest::add_url_in_the_history(QString url)
@@ -194,6 +236,7 @@ QMap<QString, QVector<QString> > HttpRequest::get_cookies()
     cookiesfile.close();
     return list_cookies;
 }
+
 
 
 
@@ -375,7 +418,7 @@ void HttpRequest::set_new_host_and_cookies(QString host, QList<QNetworkCookie>& 
     else
     {
         Logs().add_note("Error: Cookies-file does not open when try write cookies");
-       //throw;
+        //throw;
     }
     cookiesfile.close();
     

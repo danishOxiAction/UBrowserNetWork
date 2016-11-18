@@ -27,8 +27,8 @@ public:
     QMap<QDateTime, QString> get_history();
     void clear_the_cookies();
     QMap<QString, QVector<QString > > get_cookies();
-//    void remove_part_of_the_story(QList<QString>);
-//    void remove_part_of_the_cook(QList<QString>);
+    void remove_part_of_the_story(QList<QString>);
+    void remove_part_of_the_cook(QList<QString>);
 
 
 protected:

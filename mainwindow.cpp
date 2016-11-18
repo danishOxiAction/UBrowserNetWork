@@ -38,6 +38,10 @@ void MainWindow::on_pushButton_clicked()
 
 //void MainWindow::on_ck_clicked()
 //{
-//    request.clear_the_cookies();
+//    QList<QString> list_remove;
+//    list_remove.push_back("test.ru");
+//    list_remove.push_back("shotinleg.ru");
+
+//  request.remove_part_of_the_cook(list_remove);
 //}
 
