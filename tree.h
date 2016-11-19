@@ -31,12 +31,17 @@ class Tree
     Node* root;
 public:
     Tree() noexcept;
+    ~Tree() noexcept;
 
     void                push(Tag_type, const QString&, const QString&) noexcept;
+
+    void                clear();
 
     void                print() const;
 private:
     Node*               create_node(const QString&, const QString&) const throw( Exceptions );
+
+    void                free_resoureces(Node*) noexcept;
 
     void                _push(Node* parent, const QString&, const QString&) noexcept;
     Node*               search(const QString&) const throw( Exceptions );

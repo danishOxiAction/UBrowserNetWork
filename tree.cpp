@@ -8,6 +8,14 @@ Tree::Tree() noexcept
     now = nullptr;
 }
 
+Tree::~Tree() noexcept
+{
+    free_resoureces(root);
+
+    root = nullptr;
+    now = nullptr;
+}
+
 void Tree::push(Tag_type tag_type, const QString& tag_name, const QString& attributes) noexcept
 {
     switch (tag_type)
@@ -28,6 +36,14 @@ void Tree::push(Tag_type tag_type, const QString& tag_name, const QString& attri
     default:
         break;
     }
+}
+
+void Tree::clear()
+{
+    free_resoureces(root);
+
+    root = nullptr;
+    now = nullptr;
 }
 
 void Tree::print() const
@@ -57,6 +73,26 @@ typename Tree::Node* Tree::create_node(const QString& tag_name, const QString& a
     catch(std::bad_alloc& ba)
     {
         throw Exceptions(ex::STD_EXCEPTION,ba);
+    }
+}
+
+void Tree::free_resoureces(Tree::Node* node) noexcept
+{
+    if(node)
+    {
+        int i = 0;
+        while(i = node->child.size())
+        {
+            free_resoureces( node->child.takeAt(i-1) );
+        }
+
+        node->tag_name = "";
+        node->attributes = Attribute();
+        node->parent = nullptr;
+
+        delete node;
+
+        node = nullptr;
     }
 }
 
