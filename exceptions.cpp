@@ -3,26 +3,26 @@
 Exceptions::Exceptions()
 {
     _name   = "Unidentidied exception.";
-    _id     = UNIDENTIFIED;
+    _id     = ex::UNIDENTIFIED;
 }
 
-Exceptions::Exceptions(Excp_type type)
+Exceptions::Exceptions(ex::Excp_type type)
 {
     set_info(type);
 }
 
-Exceptions::Exceptions(Excp_type type, std::exception ex)
+Exceptions::Exceptions(ex::Excp_type type, std::exception ex)
     :std::exception(ex)
 {
-    if(type == STD_EXCEPTION)
+    if(type == ex::STD_EXCEPTION)
     {
         _name   = ex.what();
-        _id     = STD_EXCEPTION;
+        _id     = ex::STD_EXCEPTION;
     }
     else
     {
         _name   = "Unidentidied exception.";
-        _id     = UNIDENTIFIED;
+        _id     = ex::UNIDENTIFIED;
     }
 }
 
@@ -36,17 +36,24 @@ const int& Exceptions::id()
     return _id;
 }
 
-void Exceptions::set_info(Excp_type type)
+void Exceptions::set_info(ex::Excp_type type)
 {
     switch (type)
     {
-    case PROBLEM:
-        _name   = "Some problem.";
-        _id     = PROBLEM;
+    //--- Network Module Exceptions ---
+
+    //--- Parser Exceptions ---
+    case ex::INVALID_HTML:
+        _name   = "Invalid HTML page.";
+        _id     = ex::INVALID_HTML;
         break;
+
+    //--- Render Exceptions ---
+
+    //--- Other Exceptions ---
     default:
         _name   = "Unidentidied exception.";
-        _id     = UNIDENTIFIED;
+        _id     = ex::UNIDENTIFIED;
         break;
     }
 }

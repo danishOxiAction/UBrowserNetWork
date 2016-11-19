@@ -1,152 +1,82 @@
 #include "tree.h"
-#include <QTextStream>
-void Tree::search_node(Node* node, const QString& name)
-{
-    if(node->tag_name == name)
-    {
-        now = node->parent;
-    }
-    else
-    {
-        search_node(node->parent,name);
-    }
-}
 
-Tree::Attribute Tree::parse_attributes(const QString& attr)
-{
-    QTextStream s(stdout);
-    s << attr << "\n";
-
-    enum Condition {NONE    = 0,
-                    NAME    = 1,
-                    VALUE   = 2};
-    Condition condition = NONE;
-
-    auto it = attr.begin();
-
-    Attribute attributes;
-
-    QString name;
-    QString value;
-
-    while(it != attr.end())
-    {
-        if(it->isLetter() && condition == NONE)
-        {
-            condition = NAME;
-        }
-        else if(*it == '"' && condition == NAME)
-        {
-            condition = VALUE;
-            ++it;
-        }
-        else if(*it == '"' && condition == VALUE)
-            condition = NONE;
-
-
-
-        if( (*it == ' ' || (it+1) == attr.end() ) && condition == NONE)
-        {
-            attributes.insert(name,value);
-            name = "";
-            value = "";
-        }
-
-        if(condition == NAME) name += *it;
-        if(condition == VALUE) value += *it;
-
-        it++;
-
-        if(*it == '=') ++it;
-    }
-
-    attributes.erase(attributes.find("")); // WTF?
-
-    return attributes;
-}
-
-Tree::Tree()
+Tree::Tree() noexcept
 {
     root = nullptr;
     now = nullptr;
 }
 
-QPair<QString, QString> Tree::cut_on_name_and_attributes(const QString& tag)
+void Tree::push(Tag_type tag_type, const QString& tag_name, const QString& attributes) noexcept
 {
-    QString name;
-    QString attributes;
-
-    bool is_name = true;
-
-    for(int i = 0; i < tag.size(); i++)
+    switch (tag_type)
     {
-        if(tag[i] == ' ') is_name = false;
-
-        if(is_name)
-            name += tag[i];
-        else
-            attributes += tag[i];
-    }
-
-    return QPair<QString,QString>(name, attributes);
-}
-
-void Tree::push(Token_type type, const QString& tag)
-{
-    switch (type)
-    {
-    case START_TAG:
-    {
-        QPair<QString,QString> _tag = cut_on_name_and_attributes(tag);
-
-        if(root == nullptr)
-        {
-            root = new Node;
-
-            root->parent = nullptr;
-            root->tag_name = _tag.first;
-            if(_tag.second != "")
-                root->attributes = parse_attributes(_tag.second);
-
-            now = root;
-        }
-        else
-        {
-            now->child.push_front(new Node);
-
-            Node* temp = now->child.front();
-
-            temp->parent = now;
-            temp->tag_name = _tag.first;
-            if(_tag.second != "")
-                temp->attributes = parse_attributes(_tag.second);
-
-            now = temp;
-
-            temp = nullptr;
-        }
+    case START_TAG || TEXT:
+        _push(now, tag_name, attributes);
         break;
-    }
+    case INDEPENDENT_TAG:
+        _push(now, tag_name, attributes);
+
+        now = now->parent;
     case END_TAG:
-    {
-        QPair<QString,QString> _tag = cut_on_name_and_attributes(tag);
-        search_node(now, _tag.first);
-        break;
-    }
-    case TEXT:
-    {
-        now->child.push_front(new Node);
-
-        Node* temp = now->child.front();
-
-        temp->parent = now;
-        temp->tag_name = tag;
-
-        now = temp;
-
-        temp = nullptr;
-    }
+        now = search(tag_name)->parent;
     default:
         break;
     }
 }
+
+//
+//-------------------- Private Methods --------------------
+//
+
+typename Tree::Node* Tree::create_node(const QString& tag_name, const QString& attributes) const throw( Exceptions )
+{
+    try
+    {
+        Node* node  = new Node;
+        node->tag_name = tag_name;
+        node->attributes = Attribute(); // set_attributes(attributes);
+
+        return node;
+    }
+    catch(std::bad_alloc& ba)
+    {
+        throw Exceptions(ex::STD_EXCEPTION,ba);
+    }
+}
+
+void Tree::_push(Tree::Node* parent, const QString& tag_name, const QString& attributes) throw( Exceptions )
+{
+    Node* node = create_node(tag_name, attributes);
+    node->parent = parent;
+
+    if(parent != nullptr)
+    {
+        parent->child.push_front(node);
+    }
+    else
+    {
+        root = node;
+    }
+
+    node = nullptr;
+}
+
+Tree::Node* Tree::search(const QString& tag_name) const throw( Exceptions )
+{
+    Node* temp = now;
+
+    while(temp->parent)
+    {
+        if(temp->tag_name == tag_name)
+        {
+            return temp;
+        }
+        else
+        {
+            temp = temp->parent;
+        }
+    }
+
+    throw Exceptions(ex::INVALID_HTML);
+}
+

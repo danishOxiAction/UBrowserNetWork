@@ -11,9 +11,13 @@
  * 0x00000n - other exceptions
  */
 
+namespace ex
+{
 enum Excp_type {UNIDENTIFIED    = 0x000000,
                 STD_EXCEPTION   = 0x000001,
-                PROBLEM         = 0x100001};
+
+                INVALID_HTML    = 0x200001};
+}
 
 class Exceptions : public std::exception
 {
@@ -21,13 +25,13 @@ class Exceptions : public std::exception
     int _id;
 public:
     Exceptions();
-    Exceptions(Excp_type);
-    Exceptions(Excp_type, std::exception);
+    Exceptions(ex::Excp_type);
+    Exceptions(ex::Excp_type, std::exception);
 
     const QString&  name();
     const int&      id();
 private:
-    void    set_info(Excp_type);
+    void    set_info(ex::Excp_type);
 };
 
 #endif // EXCEPTIONS_H
