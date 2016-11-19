@@ -16,7 +16,6 @@ enum Tag_type {TEXT             = 0,
 
 class Tree
 {
-public:
     typedef QMap<QString,QString> Attribute;
 
     struct Node
@@ -33,13 +32,18 @@ public:
 public:
     Tree() noexcept;
 
-    void    push(Tag_type, const QString&, const QString&) noexcept;
+    void                push(Tag_type, const QString&, const QString&) noexcept;
 
+    void                print() const;
 private:
-    Node*   create_node(const QString&, const QString&) const throw( Exceptions );
+    Node*               create_node(const QString&, const QString&) const throw( Exceptions );
 
-    void    _push(Node* parent, const QString&, const QString&) throw( Exceptions );
-    Node*   search(const QString&) const throw( Exceptions );
+    void                _push(Node* parent, const QString&, const QString&) noexcept;
+    Node*               search(const QString&) const throw( Exceptions );
+
+    const Attribute     set_attributes(const QString&) const;
+
+    void                _print_tree(QString&, Node*, int) const;
 };
 
 #endif // TREE_H
