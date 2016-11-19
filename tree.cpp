@@ -16,6 +16,16 @@ Tree::~Tree() noexcept
     now = nullptr;
 }
 
+Tree::iterator Tree::begin() const noexcept
+{
+    return iterator(root);
+}
+
+Tree::iterator Tree::end() const noexcept
+{
+    return iterator(nullptr);
+}
+
 void Tree::push(Tag_type tag_type, const QString& tag_name, const QString& attributes) noexcept
 {
     switch (tag_type)
@@ -78,37 +88,40 @@ typename Tree::Node* Tree::create_node(const QString& tag_name, const QString& a
 
 
 //---------------- Связывает весь уровень между собой --------------------
-//Tree::Node* Tree::set_next(Node* node) noexcept
-//{
-//    Node* temp = node->parent->next; // Предок множества следующих за node элементов
-//    if(temp)
-//    {
-//        if(!temp->child.isEmpty())
-//        {
-//            temp->child.first()->prev = node;
-//            return temp->child.first();
-//        }
-//    }
+Tree::Node* Tree::set_next(Node* node) noexcept
+{
+    Node* temp = node->parent; // Предок множества следующих за node элементов
+    if(temp)
+    {
+        while(temp = temp->next)
+        {
+            if(!temp->child.isEmpty())
+            {
+                temp->child.first()->prev = node;
+                return temp->child.first();
+            }
+        }
+    }
 
-//    temp = nullptr;
+    temp = nullptr;
 
-//    return nullptr;
-//}
+    return nullptr;
+}
 
-//Tree::Node* Tree::set_prev(Node* node) noexcept
-//{
-//    if(!node->parent->child.isEmpty())
-//    {
-//        Node* temp = node->parent->child.back();
-//        temp->next = node; // Устанавливаем следующий элемент предыдущего данным элементом
+Tree::Node* Tree::set_prev(Node* node) noexcept
+{
+    if(!node->parent->child.isEmpty())
+    {
+        Node* temp = node->parent->child.back();
+        temp->next = node; // Устанавливаем следующий элемент предыдущего данным элементом
 
-//        return temp;
-//    }
-//    else
-//    {
-//        return nullptr;
-//    }
-//}
+        return temp;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
 
 void Tree::free_resoureces(Node* node) noexcept
 {
@@ -137,13 +150,8 @@ void Tree::_push(Tree::Node* parent, const QString& tag_name, const QString& att
 
     if(parent != nullptr)
     {
-        node->next = nullptr;
-        if(!parent->child.isEmpty())
-        {
-            node->prev = parent->child.back();
-            parent->child.back()->next = node;
-        }
-        else node->prev = nullptr;
+        node->next = set_next(node);
+        node->prev = set_prev(node);
 
         parent->child.push_back(node);
     }
