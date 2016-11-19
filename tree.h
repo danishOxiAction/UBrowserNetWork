@@ -8,7 +8,6 @@
 #include <QMap>
 #include <QPair>
 
-
 enum Tag_type {TEXT             = 0,
                START_TAG        = 1,
                END_TAG          = 2,
@@ -21,6 +20,10 @@ class Tree
     struct Node
     {
         Node* parent;
+
+        Node* next;
+        Node* prev;
+
         QList<Node*> child;
 
         QString tag_name;
@@ -35,11 +38,17 @@ public:
 
     void                push(Tag_type, const QString&, const QString&) noexcept;
 
+    //void                traversal();
+
     void                clear();
 
     void                print() const;
+
 private:
     Node*               create_node(const QString&, const QString&) const throw( Exceptions );
+
+//    Node*               set_next(Node*) noexcept;
+//    Node*               set_prev(Node*) noexcept;
 
     void                free_resoureces(Node*) noexcept;
 

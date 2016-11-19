@@ -76,7 +76,41 @@ typename Tree::Node* Tree::create_node(const QString& tag_name, const QString& a
     }
 }
 
-void Tree::free_resoureces(Tree::Node* node) noexcept
+
+//---------------- Связывает весь уровень между собой --------------------
+//Tree::Node* Tree::set_next(Node* node) noexcept
+//{
+//    Node* temp = node->parent->next; // Предок множества следующих за node элементов
+//    if(temp)
+//    {
+//        if(!temp->child.isEmpty())
+//        {
+//            temp->child.first()->prev = node;
+//            return temp->child.first();
+//        }
+//    }
+
+//    temp = nullptr;
+
+//    return nullptr;
+//}
+
+//Tree::Node* Tree::set_prev(Node* node) noexcept
+//{
+//    if(!node->parent->child.isEmpty())
+//    {
+//        Node* temp = node->parent->child.back();
+//        temp->next = node; // Устанавливаем следующий элемент предыдущего данным элементом
+
+//        return temp;
+//    }
+//    else
+//    {
+//        return nullptr;
+//    }
+//}
+
+void Tree::free_resoureces(Node* node) noexcept
 {
     if(node)
     {
@@ -103,10 +137,21 @@ void Tree::_push(Tree::Node* parent, const QString& tag_name, const QString& att
 
     if(parent != nullptr)
     {
+        node->next = nullptr;
+        if(!parent->child.isEmpty())
+        {
+            node->prev = parent->child.back();
+            parent->child.back()->next = node;
+        }
+        else node->prev = nullptr;
+
         parent->child.push_back(node);
     }
     else
     {
+        node->next = nullptr;
+        node->prev = nullptr;
+
         root = node;
     }
 
@@ -179,8 +224,6 @@ const Tree::Attribute Tree::set_attributes(const QString& attr) const
         if(*it == '=') ++it;
     }
 
-    attributes.erase(attributes.find("")); // WTF?
-
     return attributes;
 }
 
@@ -196,13 +239,18 @@ void Tree::_print_tree(QString& tree, Node* node, int level) const
 
     if(!node->attributes.isEmpty())
     {
-        for(auto it = node->attributes.begin(); it != node->attributes.end(); it++)
+        auto it = node->attributes.begin();
+        auto end = node->attributes.end();
+
+        while(it != end)
         {
             for(int i = 0; i <= level; i++)
             {
                 tree += " ";
             }
             tree += it.key() + " = " + it.value() + "\n";
+
+            ++it;
         }
     }
 
