@@ -55,11 +55,8 @@ public:
         Node&       operator  * () const { return *node; }
         Node*      operator -> () const { return node; }
 
-        // У одного узла не может быть одного и того же родител и одних и тех же детей
-        bool        operator != (const iterator& o) const
-        { return (node->parent == o.node->parent && node->child == o.node->child); }
-        bool        operator == (const iterator& o) const
-        { return (node->parent != o.node->parent && node->child != o.node->child); }
+        bool        operator != (const iterator& o) const { return node != o.node; }
+        bool        operator == (const iterator& o) const { return node == o.node; }
 
         iterator&   operator ++ ()
         {
@@ -76,7 +73,7 @@ public:
                     if(temp->prev == nullptr) break;
                 } while(temp = temp->prev);
 
-                while(temp != nullptr);
+                while(temp != nullptr)
                 {
                     if(!temp->child.isEmpty())
                     {
@@ -91,7 +88,6 @@ public:
                 return *this;
             }
         }
-
         iterator    operator ++ (int)
         {
             if(node->next)
@@ -108,7 +104,7 @@ public:
                     if(temp->prev == nullptr) break;
                 } while(temp = temp->prev);
 
-                while(temp);
+                while(temp)
                 {
                     if(!temp->child.isEmpty())
                     {
