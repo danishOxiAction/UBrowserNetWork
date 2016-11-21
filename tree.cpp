@@ -86,41 +86,29 @@ typename Tree::Node* Tree::create_node(const QString& tag_name, const QString& a
     }
 }
 
-
-//---------------- Связывает весь уровень между собой --------------------
-Tree::Node* Tree::set_next(Node* node) noexcept
-{
-    Node* temp = node->parent; // Предок множества следующих за node элементов
-    if(temp)
-    {
-        while(temp = temp->next)
-        {
-            if(!temp->child.isEmpty())
-            {
-                temp->child.first()->prev = node;
-                return temp->child.first();
-            }
-        }
-    }
-
-    temp = nullptr;
-
-    return nullptr;
-}
-
 Tree::Node* Tree::set_prev(Node* node) noexcept
 {
+    Node* prev = nullptr;
+
     if(!node->parent->child.isEmpty())
     {
         Node* temp = node->parent->child.back();
-        temp->next = node; // Устанавливаем следующий элемент предыдущего данным элементом
+        while(temp)
+        {
+            if(!temp->child.isEmpty())
+            {
+                temp = temp->child.back();
+            }
+            else break;
+        }
 
-        return temp;
+        prev = temp;
     }
     else
-    {
-        return nullptr;
-    }
+        prev = node->parent;
+
+    prev->next = node;
+    node->prev = prev;
 }
 
 void Tree::free_resoureces(Node* node) noexcept
@@ -150,8 +138,8 @@ void Tree::_push(Tree::Node* parent, const QString& tag_name, const QString& att
 
     if(parent != nullptr)
     {
-        node->next = set_next(node);
         node->prev = set_prev(node);
+        node->next = nullptr;
 
         parent->child.push_back(node);
     }
@@ -245,22 +233,22 @@ void Tree::_print_tree(QString& tree, Node* node, int level) const
     }
     tree += node->tag_name + "\n";
 
-    if(!node->attributes.isEmpty())
-    {
-        auto it = node->attributes.begin();
-        auto end = node->attributes.end();
+    //    if(!node->attributes.isEmpty())
+    //    {
+    //        auto it = node->attributes.begin();
+    //        auto end = node->attributes.end();
 
-        while(it != end)
-        {
-            for(int i = 0; i <= level; i++)
-            {
-                tree += " ";
-            }
-            tree += it.key() + " = " + it.value() + "\n";
+    //        while(it != end)
+    //        {
+    //            for(int i = 0; i <= level; i++)
+    //            {
+    //                tree += " ";
+    //            }
+    //            tree += it.key() + " = " + it.value() + "\n";
 
-            ++it;
-        }
-    }
+    //            ++it;
+    //        }
+    //    }
 
     for(int i = 0; i < node->child.size(); i++)
     {

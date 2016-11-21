@@ -60,66 +60,11 @@ public:
 
         iterator&   operator ++ ()
         {
-            if(node->next)
-            {
-                node = node->next;
-                return *this;
-            }
-            else
-            {
-                Node* temp = node;
-                do // Не круто. По возможности, придумать что-то ещё
-                {
-                    if(temp->prev == nullptr) break;
-                } while(temp = temp->prev);
-
-                while(temp != nullptr)
-                {
-                    if(!temp->child.isEmpty())
-                    {
-                        node = temp->child.front();
-                        return *this;
-                    }
-
-                    temp = temp->next;
-                }
-
-                node = nullptr; // end()?
-                return *this;
-            }
+            node = node->next;
         }
         iterator    operator ++ (int)
         {
-            if(node->next)
-            {
-                iterator r = *this;
-                node = node->next;
-                return r;
-            }
-            else
-            {
-                Node* temp = node;
-                do // Не круто. По возможности, придумать что-то ещё
-                {
-                    if(temp->prev == nullptr) break;
-                } while(temp = temp->prev);
-
-                while(temp)
-                {
-                    if(!temp->child.isEmpty())
-                    {
-                        iterator r = *this;
-                        node = temp->child.front();
-                        return r;
-                    }
-
-                    temp = temp->next;
-                }
-
-                iterator r = *this;
-                node = nullptr; // end()?
-                return r;
-            }
+            node = node->next;
         }
     };
 
