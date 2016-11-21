@@ -2,11 +2,12 @@
 #define TREE_H
 
 #include "exceptions.h"
+#include "node.h"
 
-#include <QList>
+#include <functional>
+
 #include <QString>
-#include <QMap>
-#include <QPair>
+#include <QQueue>
 
 enum Tag_type {TEXT             = 0,
                START_TAG        = 1,
@@ -14,36 +15,19 @@ enum Tag_type {TEXT             = 0,
                INDEPENDENT_TAG  = 3};
 
 class Tree
-{
-    typedef QMap<QString,QString> Attribute;
-
-    struct Node
-    {
-        Node* parent;
-
-        Node* next;
-        Node* prev;
-
-        QList<Node*> child;
-
-        QString tag_name;
-        Attribute attributes;
-    };
+{   
+    typedef Node::Attribute Attribute;
 
     Node* now;
     Node* root;
 public:
-    class iterator
+    class iterator // Обход в глубину
     {
-        typedef Tree::Node Node;
-        typedef QPair<QString, Attribute> value;
+        typedef QPair<QString, Node::Attribute> value;
 
         Node* node;
     public:
         typedef std::forward_iterator_tag iterator_category;
-        typedef Node  value_type;
-        typedef Node* pointer;
-        typedef Node& reference;
 
         iterator() :node(nullptr) {}
         iterator(Node* _node) :node(_node) {}
@@ -53,7 +37,7 @@ public:
         Attribute&  attributes() const { return node->attributes; }
 
         Node&       operator  * () const { return *node; }
-        Node*      operator -> () const { return node; }
+        Node*       operator -> () const { return node; }
 
         bool        operator != (const iterator& o) const { return node != o.node; }
         bool        operator == (const iterator& o) const { return node == o.node; }
@@ -61,13 +45,15 @@ public:
         iterator&   operator ++ ()
         {
             node = node->next;
+            return *this;
         }
         iterator    operator ++ (int)
         {
+            Node* r = node;
             node = node->next;
+            return r;
         }
     };
-
     friend class iterator;
 
     Tree() noexcept;
@@ -78,24 +64,22 @@ public:
 
     void                push(Tag_type, const QString&, const QString&) noexcept;
 
-    //void                traversal();
+    void                breadth_first_traversal(std::function<void (Node*)>) const noexcept;
 
     void                clear();
 
     void                print() const;
 
 private:
-    Node*               create_node(const QString&, const QString&) const throw( Exceptions );
+    void                _push(Node* parent, const QString&, const QString&) noexcept;
 
-    Node*               set_next(Node*) noexcept;
-    Node*               set_prev(Node*) noexcept;
+    Node*               create_node(const QString&, const QString&) const throw( Exceptions );
+    const Attribute     set_attributes(const QString&) const;
+    Node*               set_prev(Node*) noexcept; // Связывает добавленный узел с предыдущим
 
     void                free_resoureces(Node*) noexcept;
 
-    void                _push(Node* parent, const QString&, const QString&) noexcept;
     Node*               search(const QString&) const throw( Exceptions );
-
-    const Attribute     set_attributes(const QString&) const;
 
     void                _print_tree(QString&, Node*, int) const;
 };

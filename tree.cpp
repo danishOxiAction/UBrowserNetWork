@@ -48,6 +48,24 @@ void Tree::push(Tag_type tag_type, const QString& tag_name, const QString& attri
     }
 }
 
+void Tree::breadth_first_traversal(std::function<void (Node*)> func) const noexcept
+{
+    QQueue<Node*> queue;
+    queue.push_back(root);
+
+    while(!queue.isEmpty())
+    {
+        Node* temp = queue.takeFirst();
+
+        for(auto it = temp->child.begin(); it < temp->child.end(); ++it)
+        {
+            queue.push_back(*it);
+        }
+
+        func(temp);
+    }
+}
+
 void Tree::clear()
 {
     free_resoureces(root);
@@ -70,7 +88,7 @@ void Tree::print() const
 //-------------------- Private Methods --------------------
 //
 
-typename Tree::Node* Tree::create_node(const QString& tag_name, const QString& attributes) const throw( Exceptions )
+Node* Tree::create_node(const QString& tag_name, const QString& attributes) const throw( Exceptions )
 {
     try
     {
@@ -86,7 +104,7 @@ typename Tree::Node* Tree::create_node(const QString& tag_name, const QString& a
     }
 }
 
-Tree::Node* Tree::set_prev(Node* node) noexcept
+Node* Tree::set_prev(Node* node) noexcept
 {
     Node* prev = nullptr;
 
@@ -131,14 +149,14 @@ void Tree::free_resoureces(Node* node) noexcept
     }
 }
 
-void Tree::_push(Tree::Node* parent, const QString& tag_name, const QString& attributes) noexcept
+void Tree::_push(Node* parent, const QString& tag_name, const QString& attributes) noexcept
 {
     Node* node = create_node(tag_name, attributes);
     node->parent = parent;
 
     if(parent != nullptr)
     {
-        node->prev = set_prev(node);
+        set_prev(node);
         node->next = nullptr;
 
         parent->child.push_back(node);
@@ -156,7 +174,7 @@ void Tree::_push(Tree::Node* parent, const QString& tag_name, const QString& att
     node = nullptr;
 }
 
-Tree::Node* Tree::search(const QString& tag_name) const throw( Exceptions )
+Node* Tree::search(const QString& tag_name) const throw( Exceptions )
 {
     Node* temp = now;
 
