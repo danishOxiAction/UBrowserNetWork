@@ -1,5 +1,4 @@
 #include "tokenizer.h"
-#include "mainwindow.h"
 
 #include <QApplication>
 #include <QTextStream>
@@ -9,31 +8,47 @@
 
 #include <QTextStream>
 
-int main(int argc, char *argv[])
+void print_tree(int level, Tree::Node* node)
 {
-    QApplication app(argc, argv);
-    MainWindow window;
+    QTextStream str(stdout);
 
-//    QFile file("/home/sm4ll_3gg/html.htm");
-//    if(file.open(QFile::ReadOnly | QFile::Text))
-//    {
-//        QString str = file.readAll();
-//        str.replace("\n","");
-//        str.replace("\t","");
+    if(node == nullptr) return;
 
-//        Tokenizer tokenizer(str);
-//        tokenizer.start_tokenization();
-//        //tokenizer.print_tokens();
-//        print_tree(0,tokenizer.tree->root);
+    for(int i = 0; i < level; i++)
+    {
+        str << "_";
+    }
+    str << node->tag_name << "\n";
 
-//        file.close();
-//    }
-//    else
-//    {
-//        qDebug() << "File is not open";
-//    }
+    level++;
+    for(int i = 0; i < node->child.size(); i++)
+    {
+        print_tree(level, node->child[i]);
+    }
+}
 
-    window.show();
+int main(/*int argc, char *argv[]*/)
+{
+    //QApplication app(argc, argv);
 
-    return app.exec();
+    QFile file("/home/sm4ll_3gg/html.htm");
+    if(file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QString str = file.readAll();
+        str.replace("\n","");
+        str.replace("\t","");
+
+        Tokenizer tokenizer(str);
+        tokenizer.start_tokenization();
+        //tokenizer.print_tokens();
+        print_tree(0,tokenizer.tree->root);
+
+        file.close();
+    }
+    else
+    {
+        qDebug() << "File is not open";
+    }
+
+    //    return app.exec();
 }
