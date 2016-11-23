@@ -1,38 +1,14 @@
 #include "parser.h"
-//#include <QDebug>
-//enum Tag_type {TEXT             = 0,
-//               START_TAG        = 1,
-//               END_TAG          = 2,
-//               INDEPENDENT_TAG  = 3};
-
-//class Tree
-//{
-//public:
-//    Tree(){}
-//    void push(Tag_type token_type, QString token_name, QString token_attributes){
-//        switch (token_type) {
-//        case TEXT:
-//            qDebug()<< "Type: " << "TEXT";
-//            break;
-//        case START_TAG:
-//            qDebug()<< "Type: " << "START_TAG";
-//            break;
-//        case END_TAG:
-//            qDebug()<< "Type: " << "END_TAG";
-//            break;
-//        case INDEPENDENT_TAG:
-//            qDebug()<< "Type: " << "INDEPENDENT_TAG";
-//            break;
-//        }
-//        qDebug() <<"Tag: " << token_name << ", attributes: " << token_attributes << endl;
-//    }
-//};
 
 Parser::Parser(QString raw_html)
 {
-//    Tree tree; //MFD
+        html = raw_html;
+        html.replace("\n", "");
+        html.replace("\t", "");
+}
 
-    html = raw_html;
+void Parser::parse()
+{
     int pointer = 0;
 
     QRegExp reg_text("([^><]*)");
@@ -74,3 +50,9 @@ Parser::Parser(QString raw_html)
         }
     }
 }
+
+void Parser::print_tree()
+{
+    tree.print();
+}
+

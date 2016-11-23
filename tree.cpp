@@ -251,22 +251,22 @@ void Tree::_print_tree(QString& tree, Node* node, int level) const
     }
     tree += node->tag_name + "\n";
 
-    //    if(!node->attributes.isEmpty())
-    //    {
-    //        auto it = node->attributes.begin();
-    //        auto end = node->attributes.end();
+    if(!node->attributes.isEmpty())
+    {
+        auto it = node->attributes.begin();
+        auto end = node->attributes.end();
 
-    //        while(it != end)
-    //        {
-    //            for(int i = 0; i <= level; i++)
-    //            {
-    //                tree += " ";
-    //            }
-    //            tree += it.key() + " = " + it.value() + "\n";
+        while(it != end)
+        {
+            for(int i = 0; i <= level; i++)
+            {
+                tree += " ";
+            }
+            tree += it.key() + " = " + it.value() + "\n";
 
-    //            ++it;
-    //        }
-    //    }
+            ++it;
+        }
+    }
 
     for(int i = 0; i < node->child.size(); i++)
     {

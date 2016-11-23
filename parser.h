@@ -1,9 +1,17 @@
 #pragma once
+
+#include "tree.h"
+
 #include <QRegExp>
+
 class Parser
 {
     QString html;
-public:
 
+    Tree tree;
+public:
     Parser(QString raw_html);
+
+    void    parse();
+    void    print_tree();
 };
