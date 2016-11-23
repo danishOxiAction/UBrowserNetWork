@@ -1,10 +1,22 @@
 #include "parser.h"
 
-Parser::Parser(QString raw_html)
+Parser::Parser()
+{}
+
+Parser::Parser(const QString& raw_html)
 {
-        html = raw_html;
-        html.replace("\n", "");
-        html.replace("\t", "");
+    html = raw_html;
+    html.replace("\n", "");
+    html.replace("\t", "");
+}
+
+void Parser::new_html_page(const QString& new_html)
+{
+    html = new_html;
+    html.replace("\n", "");
+    html.replace("\t", "");
+
+    tree.clear();
 }
 
 void Parser::parse()
@@ -51,8 +63,8 @@ void Parser::parse()
     }
 }
 
-void Parser::print_tree()
+const QString Parser::print_tree()
 {
-    tree.print();
+    return tree.print();
 }
 

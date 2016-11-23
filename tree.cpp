@@ -71,17 +71,17 @@ void Tree::clear()
     free_resoureces(root);
 
     root = nullptr;
-    now = nullptr;
 }
 
-void Tree::print() const
+const QString Tree::print() const
 {
-    QTextStream str(stdout);
+//    QTextStream str(stdout);
 
     QString tree = "";
     _print_tree(tree, root, 0);
 
-    str << tree;
+    return tree;
+//    str << tree;
 }
 
 //
@@ -204,8 +204,8 @@ const Tree::Attribute Tree::set_attributes(const QString& attr) const
 
     Attribute attributes;
 
-    QString name;
-    QString value;
+    QString name = "";
+    QString value = "";
 
     while(it != attr.end())
     {
@@ -213,17 +213,17 @@ const Tree::Attribute Tree::set_attributes(const QString& attr) const
         {
             condition = NAME;
         }
-        else if(*it == '\'' && condition == NAME)
+        else if(*it == '"' && condition == NAME)
         {
             condition = VALUE;
             ++it;
         }
-        else if(*it == '\'' && condition == VALUE)
+        else if(*it == '"' && condition == VALUE)
             condition = NONE;
 
 
 
-        if( (*it == ' ' || (it+1) == attr.end() ) && condition == NONE)
+        if( (*it == ' ' || ((it+1) == attr.end()) ) && condition == NONE)
         {
             attributes.insert(name,value);
             name = "";

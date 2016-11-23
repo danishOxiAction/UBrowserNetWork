@@ -68,7 +68,7 @@ public:
 
     void                clear();
 
-    void                print() const;
+    const QString       print() const;
 
 private:
     void                _push(Node* parent, const QString&, const QString&) noexcept;

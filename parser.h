@@ -10,8 +10,10 @@ class Parser
 
     Tree tree;
 public:
-    Parser(QString raw_html);
+    Parser();
+    Parser(const QString& raw_html);
 
-    void    parse();
-    void    print_tree();
+    void            new_html_page(const QString&);
+    void            parse();
+    const QString   print_tree();
 };
