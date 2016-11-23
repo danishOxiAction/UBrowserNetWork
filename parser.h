@@ -1,12 +1,19 @@
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
 
-enum Token_type {TEXT           = 0,
-                 START_TAG      = 1,
-                 END_TAG        = 2};
+#include "tree.h"
 
-class Tokenizer;
+#include <QRegExp>
 
-class Tree;
+class Parser
+{
+    QString html;
 
-#endif // PARSER_H
+    Tree tree;
+public:
+    Parser();
+    Parser(const QString& raw_html);
+
+    void            new_html_page(const QString&);
+    void            parse();
+    const QString   print_tree();
+};

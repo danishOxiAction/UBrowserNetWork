@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include "Kernel/http_request.h"
-#include "tokenizer.h"
+#include "parser.h"
+#include "logs.h"
 
 #include <QMainWindow>
 #include <QNetworkAccessManager>
@@ -29,12 +30,14 @@ public:
     ~MainWindow();
 
 private slots:
-
     void on_pushButton_clicked();
+    //void on_ck_clicked();
 private:
-    Tokenizer tokenizer;
+    Ui::MainWindow* ui;
 
-    Ui::MainWindow *ui;
+    Logs            logs;
+    Parser          parser;
+    HttpRequest     request;
 };
 
 #endif // MAINWINDOW_H
