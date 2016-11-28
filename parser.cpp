@@ -23,10 +23,10 @@ void Parser::parse()
 {
     int pointer = 0;
 
-    QRegExp reg_text("([^><]*)");
-    QRegExp reg_scope("</?([^></]+)/?>");
-    QRegExp reg_tag("([\\S]+)");
-    QRegExp reg_attributes("\\s(.*)");
+    QRegExp reg_text("(?=\\S)([^><]*)");
+    QRegExp reg_scope("<([^><]+)/?>");
+    QRegExp reg_tag("([^\\s/]+)");
+    QRegExp reg_attributes("\\s(.*)(?!/)");
     int limit = html.size();
     while((pointer = reg_scope.indexIn( html, pointer )) != -1 && pointer < limit)
     {
@@ -56,8 +56,9 @@ void Parser::parse()
         if (reg_text.indexIn(html, pointer) != -1 && reg_text.cap(1).size() != 0)
         {
             type = TEXT;
-            tag = reg_text.cap(1);
-            attributes = "";
+            tag = "text";
+            QString attributes = "text=\"" + reg_text.cap(1) + "\""; // text="Some text"
+
             tree.push(type, tag, attributes);
         }
     }

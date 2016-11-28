@@ -602,7 +602,6 @@ QString HttpRequest::get_image(const QString &url)
     image.loadFromData(answer);
     if(image.save("image/"+get_image_name_by_url(url)))//пытаемся сохранить картинку
     {
-
         return "image/"+get_image_name_by_url(url);
     }
     else //если нельзя
@@ -610,7 +609,6 @@ QString HttpRequest::get_image(const QString &url)
         QDir().mkdir("image"); //пытаемся решить проблему создав каталог
         if(image.save("image/"+get_image_name_by_url(url)))// и пробуем снова
         {
-
             return "image/"+get_image_name_by_url(url);
         }
         else
@@ -620,11 +618,6 @@ QString HttpRequest::get_image(const QString &url)
             return "error"; //throw; // дописать возвращение картики Елькин:"ваше изображение не удалось скачать, извините"
         }
     }
-
-    
-
-    
-    
 }
 
 

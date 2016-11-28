@@ -62,7 +62,7 @@ public:
     iterator            begin() const noexcept;
     iterator            end() const noexcept;
 
-    void                push(Tag_type, const QString&, const QString&) noexcept;
+    void                push(Tag_type, const QString&, const QString&) throw( Exceptions );
 
     void                breadth_first_traversal(std::function<void (Node*)>) const noexcept;
 
@@ -71,7 +71,7 @@ public:
     const QString       print() const;
 
 private:
-    void                _push(Node* parent, const QString&, const QString&) noexcept;
+    void                _push(Node* parent, const QString&, const QString&) throw( Exceptions );
 
     Node*               create_node(const QString&, const QString&) const throw( Exceptions );
     const Attribute     set_attributes(const QString&) const;

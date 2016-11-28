@@ -1,6 +1,8 @@
 #include "tree.h"
+#include "Kernel/http_request.h"
 
 #include <QTextStream>
+#include <QDebug>
 
 Tree::Tree() noexcept
 {
@@ -26,25 +28,32 @@ Tree::iterator Tree::end() const noexcept
     return iterator(nullptr);
 }
 
-void Tree::push(Tag_type tag_type, const QString& tag_name, const QString& attributes) noexcept
+void Tree::push(Tag_type tag_type, const QString& tag_name, const QString& attributes) throw( Exceptions )
 {
-    switch (tag_type)
+    try
     {
-    case START_TAG:
-        _push(now, tag_name, attributes);
-        break;
-    case INDEPENDENT_TAG:
-        _push(now, tag_name, attributes);
-        now = now->parent;
-        break;
-    case END_TAG:
-        now = search(tag_name)->parent;
-        break;
-    case TEXT:
-        _push(now, tag_name, attributes);
-        break;
-    default:
-        break;
+        switch (tag_type)
+        {
+        case START_TAG:
+            _push(now, tag_name, attributes);
+            break;
+        case INDEPENDENT_TAG:
+            _push(now, tag_name, attributes);
+            now = now->parent;
+            break;
+        case END_TAG:
+            now = search(tag_name)->parent;
+            break;
+        case TEXT:
+            _push(now, tag_name, attributes);
+            break;
+        default:
+            break;
+        }
+    }
+    catch(Exceptions& ex)
+    {
+        qDebug() << ex.name();
     }
 }
 
@@ -75,13 +84,13 @@ void Tree::clear()
 
 const QString Tree::print() const
 {
-//    QTextStream str(stdout);
+    //    QTextStream str(stdout);
 
     QString tree = "";
     _print_tree(tree, root, 0);
 
     return tree;
-//    str << tree;
+    //    str << tree;
 }
 
 //
@@ -149,7 +158,7 @@ void Tree::free_resoureces(Node* node) noexcept
     }
 }
 
-void Tree::_push(Node* parent, const QString& tag_name, const QString& attributes) noexcept
+void Tree::_push(Node* parent, const QString& tag_name, const QString& attributes) throw( Exceptions )
 {
     Node* node = create_node(tag_name, attributes);
     node->parent = parent;
@@ -217,14 +226,23 @@ const Tree::Attribute Tree::set_attributes(const QString& attr) const
         {
             condition = VALUE;
             ++it;
+            continue;
         }
         else if(*it == '"' && condition == VALUE)
+        {
             condition = NONE;
+            ++it;
+            continue;
+        }
 
 
 
         if( (*it == ' ' || ((it+1) == attr.end()) ) && condition == NONE)
         {
+            if(name == "src")
+            {
+                //value = HttpRequest::get_image(value);
+            }
             attributes.insert(name,value);
             name = "";
             value = "";
