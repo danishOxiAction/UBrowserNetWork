@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,7 +13,24 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    tokenizer.cpp
+    exceptions.cpp \
+    logs.cpp \
+    parser.cpp \
+    tree.cpp \
+    Kernel/http_request.cpp \
+    Forms/mainwindow.cpp \
+    Forms/tab.cpp
 
 HEADERS  += \
-    tokenizer.h
+    exceptions.h \
+    logs.h \
+    node.h \
+    parser.h \
+    tree.h \
+    Kernel/http_request.h \
+    Forms/mainwindow.h \
+    Forms/tab.h
+
+FORMS += \
+    Forms/mainwindow.ui \
+    Forms/tab.ui

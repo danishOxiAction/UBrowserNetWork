@@ -1,5 +1,5 @@
 #include "parser.h"
-#include "mainwindow.h"
+#include "Forms/mainwindow.h"
 
 #include <QApplication>
 #include <QDebug>
