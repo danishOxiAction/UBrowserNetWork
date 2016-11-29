@@ -241,7 +241,8 @@ const Tree::Attribute Tree::set_attributes(const QString& attr) const
         {
             if(name == "src")
             {
-                //value = HttpRequest::get_image(value);
+                HttpRequest where_is_my_image_bitch;
+                value = where_is_my_image_bitch.get_image(value);
             }
             attributes.insert(name,value);
             name = "";

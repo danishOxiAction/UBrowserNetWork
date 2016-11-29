@@ -1,7 +1,6 @@
 #include "parser.h"
 
-Parser::Parser()
-{}
+Parser::Parser() {}
 
 Parser::Parser(const QString& raw_html)
 {
