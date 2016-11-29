@@ -1,30 +1,16 @@
-#include "tokenizer.h"
+#include "parser.h"
+#include "mainwindow.h"
 
 #include <QApplication>
-#include <QFile>
-#include <QString>
 #include <QDebug>
+#include <QFile>
 
-int main(/*int argc, char *argv[]*/)
+int main(int argc, char* argv[])
 {
-    //QApplication a(argc, argv);
+    QApplication app(argc, argv);
+    MainWindow window;
 
-    QFile doc("index.html");
+    window.show();
 
-    if(doc.open(QFile::ReadOnly | QFile::Text))
-    {
-        QString str = doc.readAll();
-
-        Tokenizer t(str);
-        t.start_tokenization();
-        t.print_tokens();
-
-        doc.close();
-    }
-    else
-    {
-        qDebug() << "Файл не был открыт";
-    }
-
-    //return a.exec();
+    return app.exec();
 }
