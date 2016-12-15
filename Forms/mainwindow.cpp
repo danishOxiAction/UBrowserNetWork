@@ -18,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabs->addTab(fst_tab,"First Tab");
     Tab* tab = new Tab(fst_tab);
 
+    QWidget* snd_tab = new QWidget;
+    ui->tabs->addTab(snd_tab, "Some Tab");
+
     logs.add_note("New session");
 }
 

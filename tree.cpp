@@ -149,7 +149,7 @@ void Tree::free_resoureces(Node* node) noexcept
         }
 
         node->tag_name = "";
-        node->attributes = Attribute();
+        node->attributes = Attributes();
         node->parent = nullptr;
 
         delete node;
@@ -202,7 +202,7 @@ Node* Tree::search(const QString& tag_name) const throw( Exceptions )
     throw Exceptions(ex::INVALID_HTML);
 }
 
-const Tree::Attribute Tree::set_attributes(const QString& attr) const
+const Attributes Tree::set_attributes(const QString& attr) const
 {
     enum Condition {NONE    = 0,
                     NAME    = 1,
@@ -211,7 +211,7 @@ const Tree::Attribute Tree::set_attributes(const QString& attr) const
 
     auto it = attr.begin();
 
-    Attribute attributes;
+    Attributes attributes;
 
     QString name = "";
     QString value = "";
@@ -244,7 +244,7 @@ const Tree::Attribute Tree::set_attributes(const QString& attr) const
                 HttpRequest where_is_my_image_bitch;
                 value = where_is_my_image_bitch.get_image(value);
             }
-            attributes.insert(name,value);
+            attributes.push(name,value);
             name = "";
             value = "";
         }
@@ -281,7 +281,7 @@ void Tree::_print_tree(QString& tree, Node* node, int level) const
             {
                 tree += " ";
             }
-            tree += it.key() + " = " + it.value() + "\n";
+            tree += (*it).first + " = " + (*it).second + "\n";
 
             ++it;
         }

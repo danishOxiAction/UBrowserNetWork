@@ -1,13 +1,12 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "attributes.h"
+
 #include <QList>
-#include <QMap>
 
 struct Node
 {
-    typedef QMap<QString,QString> Attribute;
-
     Node* parent;
 
     Node* next;
@@ -15,8 +14,8 @@ struct Node
 
     QList<Node*> child;
 
-    QString tag_name;
-    Attribute attributes;
+    QString     tag_name;
+    Attributes  attributes;
 };
 
 #endif // NODE_H

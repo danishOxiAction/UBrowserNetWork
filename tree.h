@@ -16,14 +16,12 @@ enum Tag_type {TEXT             = 0,
 
 class Tree
 {   
-    typedef Node::Attribute Attribute;
-
     Node* now;
     Node* root;
 public:
     class iterator // Обход в глубину
     {
-        typedef QPair<QString, Node::Attribute> value;
+        typedef QPair<QString, Attributes> value;
 
         Node* node;
     public:
@@ -34,7 +32,7 @@ public:
         iterator(const iterator& other) :node(other.node) {}
 
         QString&    tag_name() const { return node->tag_name; }
-        Attribute&  attributes() const { return node->attributes; }
+        Attributes& attributes() const { return node->attributes; }
 
         Node&       operator  * () const { return *node; }
         Node*       operator -> () const { return node; }
@@ -74,7 +72,7 @@ private:
     void                _push(Node* parent, const QString&, const QString&) throw( Exceptions );
 
     Node*               create_node(const QString&, const QString&) const throw( Exceptions );
-    const Attribute     set_attributes(const QString&) const;
+    const Attributes    set_attributes(const QString&) const;
     Node*               set_prev(Node*) noexcept; // Связывает добавленный узел с предыдущим
 
     void                free_resoureces(Node*) noexcept;
