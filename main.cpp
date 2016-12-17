@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "Kernel/parser.h"
 #include "Forms/mainwindow.h"
 
 #include <QApplication>
